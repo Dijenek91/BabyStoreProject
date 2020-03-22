@@ -16,10 +16,26 @@ namespace BabyStore.Controllers.ModelControllers
         private StoreContext db = new StoreContext();
 
         // GET: Products
-        public ActionResult Index()
+        public ActionResult Index(string category, string search)
         {
             var products = db.Products.Include(p => p.Category);
-            return View(products.ToList());
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                products = SearchProductsFor(search, products);
+                ViewBag.Search = search;
+            }
+        
+            var categories = products.OrderBy(p => p.Category.Name).Select(c => c.Category.Name).Distinct();
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                products = products.Where(p => p.Category.Name == category);
+            }
+
+            ViewBag.Category = new SelectList(categories);
+
+            return View(products.OrderBy(p => p.Name).ToList());
         }
 
         // GET: Products/Details/5
@@ -128,6 +144,12 @@ namespace BabyStore.Controllers.ModelControllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private static IQueryable<Product> SearchProductsFor(string search, IQueryable<Product> products)
+        {
+            return products.Where(
+                p => p.Name.Contains(search) || p.Category.Name.Contains(search) || p.Description.Contains(search));
         }
     }
 }
