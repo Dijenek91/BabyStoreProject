@@ -77,6 +77,14 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -204,6 +212,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003280724347_InitialDatabase.cs" />
+    <Compile Include="Migrations\202003280724347_InitialDatabase.Designer.cs">
+      <DependentUpon>202003280724347_InitialDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003281031576_CategoryNameValidation.cs" />
+    <Compile Include="Migrations\202003281031576_CategoryNameValidation.Designer.cs">
+      <DependentUpon>202003281031576_CategoryNameValidation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003281037251_ProdutValidation.cs" />
+    <Compile Include="Migrations\202003281037251_ProdutValidation.Designer.cs">
+      <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Product.cs" />
@@ -216,10 +237,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModel\ProductIndexViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -302,6 +325,17 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202003280724347_InitialDatabase.resx">
+      <DependentUpon>202003280724347_InitialDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003281031576_CategoryNameValidation.resx">
+      <DependentUpon>202003281031576_CategoryNameValidation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003281037251_ProdutValidation.resx">
+      <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
