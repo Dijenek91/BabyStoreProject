@@ -203,12 +203,15 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ModelControllers\CategoriesController.cs" />
+    <Compile Include="Controllers\ModelControllers\ProductImagesController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductsController.cs" />
     <Compile Include="DAL\StoreContext.cs" />
+    <Compile Include="FileOperations\FileHandler.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -224,10 +227,19 @@
     <Compile Include="Migrations\202003281037251_ProdutValidation.Designer.cs">
       <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003290810518_ProductImages.cs" />
+    <Compile Include="Migrations\202003290810518_ProductImages.Designer.cs">
+      <DependentUpon>202003290810518_ProductImages.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202003290925199_UniqueFIleName.cs" />
+    <Compile Include="Migrations\202003290925199_UniqueFIleName.Designer.cs">
+      <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Product.cs" />
+    <Compile Include="Models\BabyStoreModelClasses\ProductImage.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -314,9 +326,15 @@
     <Content Include="Views\Products\Details.cshtml" />
     <Content Include="Views\Products\Edit.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
+    <Content Include="Views\ProductImages\Upload.cshtml" />
+    <Content Include="Views\ProductImages\Delete.cshtml" />
+    <Content Include="Views\ProductImages\Details.cshtml" />
+    <Content Include="Views\ProductImages\Edit.cshtml" />
+    <Content Include="Views\ProductImages\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Content\ProductImages\Thumbnails\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -335,6 +353,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003281037251_ProdutValidation.resx">
       <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003290810518_ProductImages.resx">
+      <DependentUpon>202003290810518_ProductImages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003290925199_UniqueFIleName.resx">
+      <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

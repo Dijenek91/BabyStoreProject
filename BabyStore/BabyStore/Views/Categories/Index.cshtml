@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<BabyStore.Models.BabyStoreModelClasses.Category>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Categories";
 }
 
-<h2>Index</h2>
+<h2>@ViewBag.Title</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -20,7 +20,7 @@
 @foreach (var item in Model) {
     <tr>
         <td>            
-            @Html.ActionLink(item.Name, "Index", "Products", new { category = item.Name }, null) |
+            @Html.ActionLink(item.Name, "Index", "Products", new { category = item.Name }, null) 
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |

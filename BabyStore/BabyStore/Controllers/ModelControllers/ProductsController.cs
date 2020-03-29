@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
@@ -64,9 +61,8 @@ namespace BabyStore.Controllers.ModelControllers
                     break;
             }
       
-            const int PageItems = 10;
             int currentPage = (page ?? 1);
-            viewModel.Products = products.ToPagedList(currentPage, PageItems);
+            viewModel.Products = products.ToPagedList(currentPage, Constants.PageItems);
             viewModel.SortBy = sortBy;
             viewModel.Sorts = new Dictionary<string, string>
             {
