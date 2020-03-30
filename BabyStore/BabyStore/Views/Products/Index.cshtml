@@ -26,6 +26,8 @@
 <table class="table">
     <tr>
         <th>
+        </th>
+        <th>
             @Html.DisplayNameFor(model => Model.Category)
         </th>
         <th>
@@ -43,6 +45,14 @@
     @foreach (var item in Model.Products)
     {
         <tr>
+            <td>
+                @if (item.ProductImageMappings != null && item.ProductImageMappings.Any())
+                {
+                    <a href="@Url.Action("Details", new {id = item.ID})">
+                        <img src="@Url.Content(Constants.ProductThumbnailPath + item.ProductImageMappings.OrderBy(pi => pi.ImageNumber).ElementAt(0).ProductImage.FileName)"/>
+                    </a>
+                }
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Category.Name)
             </td>

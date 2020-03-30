@@ -208,6 +208,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ModelControllers\CategoriesController.cs" />
+    <Compile Include="Controllers\ModelControllers\ErrorController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductImagesController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductsController.cs" />
     <Compile Include="DAL\StoreContext.cs" />
@@ -235,11 +236,16 @@
     <Compile Include="Migrations\202003290925199_UniqueFIleName.Designer.cs">
       <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003291739072_CreateProductImageMappings.cs" />
+    <Compile Include="Migrations\202003291739072_CreateProductImageMappings.Designer.cs">
+      <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Product.cs" />
     <Compile Include="Models\BabyStoreModelClasses\ProductImage.cs" />
+    <Compile Include="Models\BabyStoreModelClasses\ProductImageMapping.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -250,6 +256,7 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\ProductIndexViewModel.cs" />
+    <Compile Include="ViewModel\ProductViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -331,6 +338,7 @@
     <Content Include="Views\ProductImages\Details.cshtml" />
     <Content Include="Views\ProductImages\Edit.cshtml" />
     <Content Include="Views\ProductImages\Index.cshtml" />
+    <Content Include="Views\Error\FileUploadLimitExceeded.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -359,6 +367,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003290925199_UniqueFIleName.resx">
       <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003291739072_CreateProductImageMappings.resx">
+      <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
