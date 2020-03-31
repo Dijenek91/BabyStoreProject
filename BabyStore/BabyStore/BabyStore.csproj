@@ -240,6 +240,10 @@
     <Compile Include="Migrations\202003291739072_CreateProductImageMappings.Designer.cs">
       <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003310844231_ProductIDNameUpdate.cs" />
+    <Compile Include="Migrations\202003310844231_ProductIDNameUpdate.Designer.cs">
+      <DependentUpon>202003310844231_ProductIDNameUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
@@ -457,6 +461,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003291739072_CreateProductImageMappings.resx">
       <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003310844231_ProductIDNameUpdate.resx">
+      <DependentUpon>202003310844231_ProductIDNameUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

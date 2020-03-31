@@ -211,7 +211,7 @@ namespace BabyStore.Controllers.ModelControllers
 
             foreach (var mapping in mappings)
             {
-                var mappingsToUpdate = db.ProductImageMappings.Where(pim => pim.ProductId == mapping.ProductId);
+                var mappingsToUpdate = db.ProductImageMappings.Where(pim => pim.ProductID == mapping.ProductID);
 
                 foreach (var productMapping in mappingsToUpdate)
                 {

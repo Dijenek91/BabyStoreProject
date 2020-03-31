@@ -27,9 +27,9 @@ namespace BabyStore.Migrations
         public override void Down()
         {
             DropForeignKey("dbo.ProductImageMappings", "ProductImageID", "dbo.ProductImages");
-            DropForeignKey("dbo.ProductImageMappings", "ProductId", "dbo.Products");
+            DropForeignKey("dbo.ProductImageMappings", "ProductID", "dbo.Products");
             DropIndex("dbo.ProductImageMappings", new[] { "ProductImageID" });
-            DropIndex("dbo.ProductImageMappings", new[] { "ProductId" });
+            DropIndex("dbo.ProductImageMappings", new[] { "ProductID" });
             DropTable("dbo.ProductImageMappings");
         }
     }
