@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -209,6 +207,24 @@ namespace BabyStore.Controllers.ModelControllers
         public ActionResult DeleteConfirmed(int id)
         {
             ProductImage productImage = db.ProductImages.Find(id);
+            var mappings = db.ProductImageMappings.Where(pim => pim.ProductImageID == id).ToList();
+
+            foreach (var mapping in mappings)
+            {
+                var mappingsToUpdate = db.ProductImageMappings.Where(pim => pim.ProductId == mapping.ProductId);
+
+                foreach (var productMapping in mappingsToUpdate)
+                {
+                    if (productMapping.ImageNumber > mapping.ImageNumber)
+                    {
+                        productMapping.ImageNumber--;
+                    }
+                }
+            }
+
+            System.IO.File.Delete(Request.MapPath(Constants.ProductImagePath + productImage.FileName));
+            System.IO.File.Delete(Request.MapPath(Constants.ProductThumbnailPath + productImage.FileName));
+
             db.ProductImages.Remove(productImage);
             db.SaveChanges();
             return RedirectToAction("Index");

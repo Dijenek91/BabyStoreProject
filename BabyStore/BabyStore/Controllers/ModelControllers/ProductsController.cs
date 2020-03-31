@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Metadata.Edm;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
@@ -166,9 +166,10 @@ namespace BabyStore.Controllers.ModelControllers
 
             viewModel.CategoryList = new SelectList(db.Categories, "ID", "Name", product.CategoryID);
             viewModel.ImageLists = new List<SelectList>();
-            foreach (var imageMapping in product.ProductImageMappings)
+
+            foreach (var imageMapping in product.ProductImageMappings.OrderBy(pi => pi.ImageNumber))
             {
-                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName", imageMapping.ImageNumber));
+                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName", imageMapping.ProductImageID));
             }
             for (int i = viewModel.ImageLists.Count; i < Constants.NumberOfProductImages; i++)
             {
@@ -186,8 +187,7 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(ProductViewModel viewModel)
         {
-            var productToUpdate =
-                db.Products.Include(p => p.ProductImageMappings).Where(p => p.ID == viewModel.ID).Single();
+            var productToUpdate = db.Products.Include(p => p.ProductImageMappings).Where(p => p.ID == viewModel.ID).Single();
 
             if (TryUpdateModel(productToUpdate, "", new string[] {"Name", "Description", "Price", "CategoryID"}))
             {
@@ -195,12 +195,11 @@ namespace BabyStore.Controllers.ModelControllers
                 {
                     productToUpdate.ProductImageMappings = new List<ProductImageMapping>();
                 }
-                string[] productImages = viewModel.ProductImages.Where(pi => !string.IsNullOrEmpty(pi)).ToArray();
-                for (int i = 0; i < productImages.Length; i++)
+                string[] submitedImages = viewModel.ProductImages.Where(pi => !string.IsNullOrEmpty(pi)).ToArray();
+                for (int i = 0; i < submitedImages.Length; i++)
                 {
-                    var imageMappingToEdit =
-                        productToUpdate.ProductImageMappings.Where(pi => pi.ImageNumber == i).FirstOrDefault();
-                    var image = db.ProductImages.Find(int.Parse(productImages[i]));
+                    var imageMappingToEdit = productToUpdate.ProductImageMappings.Where(pi => pi.ImageNumber == i).FirstOrDefault();
+                    var image = db.ProductImages.Find(int.Parse(submitedImages[i]));
                     
                     //if there is nothing stored then we need to add a new mapping
                     if (imageMappingToEdit == null)
@@ -217,18 +216,18 @@ namespace BabyStore.Controllers.ModelControllers
                     else
                     {
                         //if they are not the same
-                        if (imageMappingToEdit.ProductImageID != int.Parse(productImages[i]))
+                        if (imageMappingToEdit.ProductImageID != int.Parse(submitedImages[i]))
                         {
                             //assign image property of the image mapping
                             imageMappingToEdit.ProductImage = image;
                         }
                     }
                 }
-
-                for (int i = productImages.Length; i < Constants.NumberOfProductImages; i++)
+                
+                //remove old images if they differ from new submited iamges on product
+                for (int i = submitedImages.Length; i < Constants.NumberOfProductImages; i++)
                 {
-                    var imageMappingToEdit = productToUpdate.ProductImageMappings.Where(pim =>
-                    pim.ImageNumber == i).FirstOrDefault();
+                    var imageMappingToEdit = productToUpdate.ProductImageMappings.Where(pim => pim.ImageNumber == i).FirstOrDefault();
                     //if there is something stored in the mapping
                     if (imageMappingToEdit != null)
                     {

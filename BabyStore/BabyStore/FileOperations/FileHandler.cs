@@ -22,6 +22,7 @@ namespace BabyStore.FileOperations
         public static void SaveFileToDisk(HttpPostedFileBase file)
         {
             WebImage img = new WebImage(file.InputStream);
+            img.FileName = file.FileName;
 
             ResizeAndSaveImage(img);
             ResizeAndSaveThumbnail(img);
