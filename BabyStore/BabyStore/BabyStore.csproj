@@ -427,10 +427,9 @@
     <Content Include="Views\Products\Index.cshtml" />
     <Content Include="Views\ProductImages\Upload.cshtml" />
     <Content Include="Views\ProductImages\Delete.cshtml" />
-    <Content Include="Views\ProductImages\Details.cshtml" />
-    <Content Include="Views\ProductImages\Edit.cshtml" />
     <Content Include="Views\ProductImages\Index.cshtml" />
     <Content Include="Views\Error\FileUploadLimitExceeded.cshtml" />
+    <Content Include="Views\Shared\_ProductEditCreatePartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
