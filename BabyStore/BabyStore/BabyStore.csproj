@@ -205,12 +205,14 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ModelControllers\CategoriesController.cs" />
     <Compile Include="Controllers\ModelControllers\ErrorController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductImagesController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductsController.cs" />
+    <Compile Include="Controllers\RolesAdminController.cs" />
     <Compile Include="DAL\StoreContext.cs" />
     <Compile Include="FileOperations\FileHandler.cs" />
     <Compile Include="Global.asax.cs">
@@ -261,6 +263,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModel\ProductIndexViewModel.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
+    <Compile Include="ViewModel\Security\AdminViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -430,6 +433,12 @@
     <Content Include="Views\ProductImages\Index.cshtml" />
     <Content Include="Views\Error\FileUploadLimitExceeded.cshtml" />
     <Content Include="Views\Shared\_ProductEditCreatePartial.cshtml" />
+    <Content Include="Views\RolesAdmin\Index.cshtml" />
+    <Content Include="Views\RolesAdmin\Details.cshtml" />
+    <Content Include="Views\RolesAdmin\Create.cshtml" />
+    <Content Include="Views\RolesAdmin\Edit.cshtml" />
+    <Content Include="Views\RolesAdmin\Delete.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
