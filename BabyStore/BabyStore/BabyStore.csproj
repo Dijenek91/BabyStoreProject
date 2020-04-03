@@ -212,41 +212,27 @@
     <Compile Include="Controllers\ModelControllers\ErrorController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductImagesController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductsController.cs" />
-    <Compile Include="Controllers\RolesAdminController.cs" />
+    <Compile Include="Controllers\Admin\RolesAdminController.cs" />
+    <Compile Include="Controllers\Admin\UsersAdminController.cs" />
     <Compile Include="DAL\StoreContext.cs" />
     <Compile Include="FileOperations\FileHandler.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003280724347_InitialDatabase.cs" />
-    <Compile Include="Migrations\202003280724347_InitialDatabase.Designer.cs">
-      <DependentUpon>202003280724347_InitialDatabase.cs</DependentUpon>
+    <Compile Include="Migrations\202004010943405_InitialCreate.cs" />
+    <Compile Include="Migrations\202004010943405_InitialCreate.Designer.cs">
+      <DependentUpon>202004010943405_InitialCreate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003281031576_CategoryNameValidation.cs" />
-    <Compile Include="Migrations\202003281031576_CategoryNameValidation.Designer.cs">
-      <DependentUpon>202003281031576_CategoryNameValidation.cs</DependentUpon>
+    <Compile Include="Migrations\202004020953082_twocontextreset.cs" />
+    <Compile Include="Migrations\202004020953082_twocontextreset.Designer.cs">
+      <DependentUpon>202004020953082_twocontextreset.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003281037251_ProdutValidation.cs" />
-    <Compile Include="Migrations\202003281037251_ProdutValidation.Designer.cs">
-      <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202003290810518_ProductImages.cs" />
-    <Compile Include="Migrations\202003290810518_ProductImages.Designer.cs">
-      <DependentUpon>202003290810518_ProductImages.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202003290925199_UniqueFIleName.cs" />
-    <Compile Include="Migrations\202003290925199_UniqueFIleName.Designer.cs">
-      <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202003291739072_CreateProductImageMappings.cs" />
-    <Compile Include="Migrations\202003291739072_CreateProductImageMappings.Designer.cs">
-      <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202003310844231_ProductIDNameUpdate.cs" />
-    <Compile Include="Migrations\202003310844231_ProductIDNameUpdate.Designer.cs">
-      <DependentUpon>202003310844231_ProductIDNameUpdate.cs</DependentUpon>
+    <Compile Include="Migrations\202004020958245_update_user_fields.cs" />
+    <Compile Include="Migrations\202004020958245_update_user_fields.Designer.cs">
+      <DependentUpon>202004020958245_update_user_fields.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\StoreConfiguration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Product.cs" />
@@ -254,6 +240,7 @@
     <Compile Include="Models\BabyStoreModelClasses\ProductImageMapping.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\UserData\Address.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -264,6 +251,7 @@
     <Compile Include="ViewModel\ProductIndexViewModel.cs" />
     <Compile Include="ViewModel\ProductViewModel.cs" />
     <Compile Include="ViewModel\Security\AdminViewModel.cs" />
+    <Compile Include="ViewModel\Security\EditUserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -439,6 +427,12 @@
     <Content Include="Views\RolesAdmin\Edit.cshtml" />
     <Content Include="Views\RolesAdmin\Delete.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\UsersAdmin\Index.cshtml" />
+    <Content Include="Views\UsersAdmin\Details.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\Address.cshtml" />
+    <Content Include="Views\UsersAdmin\Create.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Address.cshtml" />
+    <Content Include="Views\UsersAdmin\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -452,26 +446,14 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202003280724347_InitialDatabase.resx">
-      <DependentUpon>202003280724347_InitialDatabase.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202004010943405_InitialCreate.resx">
+      <DependentUpon>202004010943405_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003281031576_CategoryNameValidation.resx">
-      <DependentUpon>202003281031576_CategoryNameValidation.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202004020953082_twocontextreset.resx">
+      <DependentUpon>202004020953082_twocontextreset.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003281037251_ProdutValidation.resx">
-      <DependentUpon>202003281037251_ProdutValidation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003290810518_ProductImages.resx">
-      <DependentUpon>202003290810518_ProductImages.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003290925199_UniqueFIleName.resx">
-      <DependentUpon>202003290925199_UniqueFIleName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003291739072_CreateProductImageMappings.resx">
-      <DependentUpon>202003291739072_CreateProductImageMappings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003310844231_ProductIDNameUpdate.resx">
-      <DependentUpon>202003310844231_ProductIDNameUpdate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202004020958245_update_user_fields.resx">
+      <DependentUpon>202004020958245_update_user_fields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

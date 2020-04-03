@@ -16,10 +16,12 @@ namespace BabyStore.Models
         [Display(Name = "First Name")]
         [StringLength(50)]
         public string FirstName { get; set; }
+
         [Required]
         [Display(Name = "Last Name")]
         [StringLength(50)]
         public string LastName { get; set; }
+
         [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Date of birth")]
