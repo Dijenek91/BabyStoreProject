@@ -1,11 +1,15 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using BabyStore.Models;
 using BabyStore.ViewModel.Security;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 
 namespace BabyStore.Controllers.Admin
@@ -156,46 +160,48 @@ namespace BabyStore.Controllers.Admin
                     Value = x.Name
                 })
             };
-            ViewBag.RoleId = await UserManager.GetRolesAsync(id);
-            return View();
+            
+            return View(viewModel);
         }
 
         // POST: UsersAdmin/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async Task<ActionResult> Edit(EditUserViewModel viewModel, params string[] selectedRole)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add update logic here
+                var user = await UserManager.FindByIdAsync(viewModel.Id);
+                if (user == null)
+                {
+                    return HttpNotFound();
+                }
+
+                user.FirstName = viewModel.FirstName;
+                user.LastName = viewModel.LastName;
+                user.DateOfBirth = viewModel.DateOfBirth;
+                user.Address = viewModel.Address;
+                
+                var userRoles = await UserManager.GetRolesAsync(viewModel.Id);
+               
+                var addResult = await UserManager.AddToRolesAsync(user.Id, selectedRole.Except(userRoles).ToArray());
+                if (!addResult.Succeeded)
+                {
+                    ModelState.AddModelError("", addResult.Errors.First());
+                    return View();
+                }
+                
+                var removeResult = await UserManager.RemoveFromRolesAsync(user.Id, userRoles.Except(selectedRole).ToArray());
+                if (!removeResult.Succeeded)
+                {
+                    ModelState.AddModelError("", removeResult.Errors.First());
+                    return View();
+                }
 
                 return RedirectToAction("Index");
             }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: UsersAdmin/Delete/5
-        public ActionResult Delete(int id)
-        {
+           
+            ModelState.AddModelError("", "Something failed.");
             return View();
-        }
-
-        // POST: UsersAdmin/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
         }
     }
 }
