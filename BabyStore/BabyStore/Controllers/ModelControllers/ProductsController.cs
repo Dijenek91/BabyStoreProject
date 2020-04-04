@@ -11,11 +11,13 @@ using PagedList;
 
 namespace BabyStore.Controllers.ModelControllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductsController : Controller
     {
         private StoreContext db = new StoreContext();
 
         // GET: Products
+        [AllowAnonymous]
         public ActionResult Index(string category, string search, string sortBy, int? page)
         {
             ProductIndexViewModel viewModel = new ProductIndexViewModel();
@@ -75,6 +77,7 @@ namespace BabyStore.Controllers.ModelControllers
         }
 
         // GET: Products/Details/5
+        [AllowAnonymous]
         public ActionResult Details(int? id)
         {
             if (id == null)
