@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Data.Entity.Validation;
 using System.Text;
 using BabyStore.Models.BabyStoreModelClasses;
+using BabyStore.Models.Orders;
+using BabyStore.Models.UserData;
 
 namespace BabyStore.Migrations.StoreConfigurations
 {
@@ -164,6 +167,45 @@ namespace BabyStore.Migrations.StoreConfigurations
 
                     imageMappings.ForEach(c => context.ProductImageMappings.AddOrUpdate(im => im.ProductImageID, c));
                     context.SaveChanges();
+
+                var orders = new List<Order>
+                {
+                    new Order { DeliveryAddress = new Address { AddressLine1="1 Some Street",
+                        Town="Town1", County="County", Postcode="PostCode" }, TotalPrice=4.99M,
+                        UserID="admin@example.com", DateCreated=new DateTime(2014, 1, 1) ,DeliveryName="Admin" },
+                    new Order { DeliveryAddress = new Address { AddressLine1="1 Some Street",
+                        Town="Town1", County="County", Postcode="PostCode" }, TotalPrice=2.99M,
+                        UserID="admin@example.com", DateCreated=new DateTime(2014, 1, 2) ,DeliveryName="Admin" },
+                    new Order { DeliveryAddress = new Address { AddressLine1="1 Some Street",
+                        Town="Town1", County="County", Postcode="PostCode" }, TotalPrice=1.99M,
+                        UserID="admin@example.com", DateCreated=new DateTime(2014, 1, 3) ,DeliveryName="Admin" },
+                    new Order { DeliveryAddress = new Address { AddressLine1="1 Some Street",
+                        Town="Town1", County="County", Postcode="PostCode" }, TotalPrice=24.99M,
+                        UserID="admin@example.com", DateCreated=new DateTime(2014, 1, 4) ,DeliveryName="Admin" },
+                    new Order { DeliveryAddress = new Address { AddressLine1="1 Some Street",
+                        Town ="Town1", County="County", Postcode="PostCode" }, TotalPrice=8.99M,
+                        UserID ="admin@example.com", DateCreated=new DateTime(2014, 1, 5) , DeliveryName="Admin" }
+                };
+
+                orders.ForEach(c => context.Orders.AddOrUpdate(o => o.DateCreated, c));
+                context.SaveChanges();
+
+                var orderLines = new List<OrderLine>
+                {
+                    new OrderLine { OrderID = 1, ProductID = products.Single( c=> c.Name == "Sleep Suit").ID, ProductName="Sleep Suit",
+                        Quantity =1,UnitPrice = products.Single( c=>c.Name == "Sleep Suit").Price },
+                    new OrderLine { OrderID = 2, ProductID = products.Single( c=> c.Name == "Vest").ID, ProductName="Vest",
+                        Quantity =1, UnitPrice = products.Single( c=> c.Name == "Vest").Price },
+                    new OrderLine { OrderID = 3, ProductID = products.Single( c=> c.Name == "Orange and Yellow Lion").ID, ProductName="Orange and Yellow Lion",
+                        Quantity = 1, UnitPrice=products.Single( c=> c.Name == "Orange and Yellow Lion").Price },
+                    new OrderLine { OrderID = 4, ProductID = products.Single( c=> c.Name == "3 Pack of Bottles").ID, ProductName="3 Pack of Bottles",
+                        Quantity =1, UnitPrice= products.Single( c=> c.Name == "3 Pack of Bottles").Price },
+                    new OrderLine { OrderID = 5, ProductID = products.Single( c=> c.Name == "3 Pack of Bibs").ID, ProductName ="3 Pack of Bibs",
+                        Quantity =1, UnitPrice=products.Single(c=> c.Name == "3 Pack of Bibs").Price }
+                };
+
+                orderLines.ForEach(c => context.OrderLines.AddOrUpdate(ol => ol.OrderID, c));
+                context.SaveChanges();
             }
             catch (DbEntityValidationException ex)
             {

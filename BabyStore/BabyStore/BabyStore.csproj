@@ -211,6 +211,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ModelControllers\CategoriesController.cs" />
     <Compile Include="Controllers\ModelControllers\ErrorController.cs" />
+    <Compile Include="Controllers\ModelControllers\OrdersController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductImagesController.cs" />
     <Compile Include="Controllers\ModelControllers\ProductsController.cs" />
     <Compile Include="Controllers\Admin\RolesAdminController.cs" />
@@ -236,6 +237,10 @@
     <Compile Include="Migrations\202004050758247_AddBasketLine.Designer.cs">
       <DependentUpon>202004050758247_AddBasketLine.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004060842002_addOrders.cs" />
+    <Compile Include="Migrations\202004060842002_addOrders.Designer.cs">
+      <DependentUpon>202004060842002_addOrders.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\StoreConfiguration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -247,6 +252,8 @@
     <Compile Include="Models\BabyStoreModelClasses\ProductImageMapping.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\Orders\Order.cs" />
+    <Compile Include="Models\Orders\OrderLine.cs" />
     <Compile Include="Models\UserData\Address.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -448,6 +455,11 @@
     <Content Include="Views\Shared\_EditUserPartial.cshtml" />
     <Content Include="Views\Basket\Index.cshtml" />
     <Content Include="Views\Basket\Summary.cshtml" />
+    <Content Include="Views\Orders\Create.cshtml" />
+    <Content Include="Views\Orders\Delete.cshtml" />
+    <Content Include="Views\Orders\Details.cshtml" />
+    <Content Include="Views\Orders\Edit.cshtml" />
+    <Content Include="Views\Orders\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -472,6 +484,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004050758247_AddBasketLine.resx">
       <DependentUpon>202004050758247_AddBasketLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004060842002_addOrders.resx">
+      <DependentUpon>202004060842002_addOrders.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

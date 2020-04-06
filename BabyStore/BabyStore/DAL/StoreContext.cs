@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using BabyStore.Models.BabyStoreModelClasses;
+using BabyStore.Models.Orders;
 
 namespace BabyStore.DAL
 {
@@ -10,5 +11,7 @@ namespace BabyStore.DAL
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ProductImageMapping> ProductImageMappings { get; set; }
         public DbSet<BasketLine> BasketLines { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderLine> OrderLines { get; set; }
     }
 }
