@@ -88,3 +88,4 @@ D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\PagedList.Mvc.x
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.StoreConfigurations.twocontextreset.resources
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.InitialCreate.resources
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.update_user_fields.resources
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.StoreConfigurations.AddBasketLine.resources

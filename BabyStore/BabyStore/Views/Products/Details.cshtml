@@ -58,13 +58,25 @@
                 }
             </dd>
         }
+        <dt>
+            Quantity:
+        </dt>
+        <dd>
+            @using (Html.BeginForm("AddToBasket", "Basket"))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.ID)
+                @Html.DropDownList("quantity", Enumerable.Range(1, 10).Select(i => new SelectListItem{ Text = i.ToString(), Value = i.ToString() }))
+                <input type="submit" class="btn btn-primary btn-xs" value="Add to Basket">
+            }
+        </dd>
 
     </dl>
 </div>
 <p>
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
     {
-        @Html.ActionLink("Edit", "Edit", new {id = Model.ID}) |
+        @Html.ActionLink("Edit", "Edit", new {id = Model.ID})
     }
     @Html.ActionLink("Back to List", "Index")
 </p>

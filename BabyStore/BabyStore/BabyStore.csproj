@@ -206,6 +206,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\BasketController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ModelControllers\CategoriesController.cs" />
@@ -231,9 +232,15 @@
     <Compile Include="Migrations\202004020958245_update_user_fields.Designer.cs">
       <DependentUpon>202004020958245_update_user_fields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004050758247_AddBasketLine.cs" />
+    <Compile Include="Migrations\202004050758247_AddBasketLine.Designer.cs">
+      <DependentUpon>202004050758247_AddBasketLine.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\StoreConfiguration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\BabyStoreModelClasses\Basket.cs" />
+    <Compile Include="Models\BabyStoreModelClasses\BasketLine.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Category.cs" />
     <Compile Include="Models\BabyStoreModelClasses\Product.cs" />
     <Compile Include="Models\BabyStoreModelClasses\ProductImage.cs" />
@@ -248,8 +255,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <Compile Include="ViewModel\ProductIndexViewModel.cs" />
-    <Compile Include="ViewModel\ProductViewModel.cs" />
+    <Compile Include="ViewModel\Basket\BasketSummaryViewModel.cs" />
+    <Compile Include="ViewModel\Basket\BasketViewModel.cs" />
+    <Compile Include="ViewModel\Product\ProductIndexViewModel.cs" />
+    <Compile Include="ViewModel\Product\ProductViewModel.cs" />
     <Compile Include="ViewModel\Security\AdminViewModel.cs" />
     <Compile Include="ViewModel\Security\EditUserViewModel.cs" />
   </ItemGroup>
@@ -437,6 +446,8 @@
     <Content Include="Views\Shared\_UserDetailsPartial.cshtml" />
     <Content Include="Views\Manage\Edit.cshtml" />
     <Content Include="Views\Shared\_EditUserPartial.cshtml" />
+    <Content Include="Views\Basket\Index.cshtml" />
+    <Content Include="Views\Basket\Summary.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -458,6 +469,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004020958245_update_user_fields.resx">
       <DependentUpon>202004020958245_update_user_fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004050758247_AddBasketLine.resx">
+      <DependentUpon>202004050758247_AddBasketLine.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

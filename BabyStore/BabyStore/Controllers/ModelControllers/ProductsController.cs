@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
-using BabyStore.ViewModel;
+using BabyStore.ViewModel.Product;
 using PagedList;
 
 namespace BabyStore.Controllers.ModelControllers

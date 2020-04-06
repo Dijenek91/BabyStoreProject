@@ -21,7 +21,7 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    
                     <li>@Html.RouteLink("View all our Products", "ProductsIndex")</li>
                     <li>@Html.ActionLink("View Categories", "Index", "Categories")</li>
                     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
@@ -37,6 +37,7 @@
                     <button type="submit" class="btn btn-default">Submit</button>
                 }
                 @Html.Partial("_LoginPartial")
+                @Html.Action("Summary", "Basket")
             </div>
         </div>
     </div>
