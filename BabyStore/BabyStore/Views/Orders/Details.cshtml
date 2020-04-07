@@ -1,15 +1,57 @@
 ﻿@model BabyStore.Models.Orders.Order
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Order Details";
 }
 
-<h2>Details</h2>
+<h2>@ViewBag.Title</h2>
 
+<div class="row">
+    <div class="col-md-3">
+        <label>Item(s)</label>
+    </div>
+    <div class="col-md-2">
+        <label>Quantity</label>
+    </div>
+    <div class="col-md-1">
+        <label>Unit Price</label>
+    </div>
+</div>
+<hr />
+@foreach (var line in Model.OrderLines)
+{
+    <div class="row">
+        <div class="col-md-3">
+            @Html.DisplayFor(pn => line.ProductName)
+        </div>
+        <div class="col-md-2">
+            @Html.DisplayFor(q => line.Quantity)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayFor(up => line.UnitPrice)
+        </div>
+    </div>
+}
+<hr />
 <div>
-    <h4>Order</h4>
-    <hr />
     <dl class="dl-horizontal">
+        
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalPrice)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderID)
+        </dd>
+
         <dt>
             @Html.DisplayNameFor(model => model.UserID)
         </dt>
@@ -35,24 +77,14 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.TotalPrice)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TotalPrice)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.DateCreated)
         </dt>
 
         <dd>
             @Html.DisplayFor(model => model.DateCreated)
         </dd>
-
-    </dl>
+</dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.OrderID }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
