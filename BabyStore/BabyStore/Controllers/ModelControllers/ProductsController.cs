@@ -5,7 +5,7 @@ using System.Net;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
-using BabyStore.ViewModel.Product;
+using BabyStore.ViewModel.Products;
 using PagedList;
 
 namespace BabyStore.Controllers.ModelControllers

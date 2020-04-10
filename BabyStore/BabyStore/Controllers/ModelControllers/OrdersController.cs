@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
 using BabyStore.Models.Orders;
+using BabyStore.Utilities;
 using Microsoft.AspNet.Identity.Owin;
 
 namespace BabyStore.Controllers.ModelControllers
@@ -34,7 +35,7 @@ namespace BabyStore.Controllers.ModelControllers
         }
 
         // GET: Orders
-        public ActionResult Index(string orderSearch, string startDate, string endDate, string orderSortOrder)
+        public async Task<ActionResult> Index(string orderSearch, string startDate, string endDate, string orderSortOrder, int? page)
         {
             var orders = db.Orders.OrderBy(o => o.DateCreated).Include(o => o.OrderLines);
             if (!User.IsInRole("Admin"))
@@ -65,7 +66,7 @@ namespace BabyStore.Controllers.ModelControllers
                 orders = orders.Where(o => o.DateCreated <= parsedEndDate);
             }
 
-            ViewBag.DateSort = String.IsNullOrEmpty(orderSortOrder) ? "date" : "";
+            ViewBag.DateSort = string.IsNullOrEmpty(orderSortOrder) ? "date" : "";
             ViewBag.UserSort = orderSortOrder == "user" ? "user_desc" : "user";
             ViewBag.PriceSort = orderSortOrder == "price" ? "price_desc" : "price";
             ViewBag.CurrentOrderSearch = orderSearch;
@@ -93,7 +94,13 @@ namespace BabyStore.Controllers.ModelControllers
                     orders = orders.OrderByDescending(o => o.DateCreated);
                     break;
             }
-            return View(orders);
+
+            int currentPage = (page ?? 1);
+            ViewBag.CurrentPage = currentPage;
+            ViewBag.TotalPages = (int)Math.Ceiling((decimal)orders.Count() / Constants.PageItems);
+            var currentPageOfOrders = await orders.ReturnPages(currentPage, Constants.PageItems);
+            ViewBag.CurrentSortOrder = orderSortOrder;
+            return View(currentPageOfOrders);
         }
 
         // GET: Orders/Details/5

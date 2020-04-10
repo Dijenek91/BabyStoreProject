@@ -221,6 +221,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="HTMLHelpers\PagingLinks.cs" />
     <Compile Include="Migrations\202004010943405_InitialCreate.cs" />
     <Compile Include="Migrations\202004010943405_InitialCreate.Designer.cs">
       <DependentUpon>202004010943405_InitialCreate.cs</DependentUpon>
@@ -262,10 +263,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <Compile Include="Utilities\AsyncPaging.cs" />
     <Compile Include="ViewModel\Basket\BasketSummaryViewModel.cs" />
     <Compile Include="ViewModel\Basket\BasketViewModel.cs" />
-    <Compile Include="ViewModel\Product\ProductIndexViewModel.cs" />
-    <Compile Include="ViewModel\Product\ProductViewModel.cs" />
+    <Compile Include="ViewModel\Products\BestSellersViewModel.cs" />
+    <Compile Include="ViewModel\Products\ProductIndexViewModel.cs" />
+    <Compile Include="ViewModel\Products\ProductViewModel.cs" />
     <Compile Include="ViewModel\Security\AdminViewModel.cs" />
     <Compile Include="ViewModel\Security\EditUserViewModel.cs" />
   </ItemGroup>
