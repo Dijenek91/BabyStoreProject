@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
 using BabyStore.ViewModel.Products;
 using PagedList;
+using BabyStore.Utilities;
 
 namespace BabyStore.Controllers.ModelControllers
 {
@@ -17,7 +20,7 @@ namespace BabyStore.Controllers.ModelControllers
 
         // GET: Products
         [AllowAnonymous]
-        public ActionResult Index(string category, string search, string sortBy, int? page)
+        public async Task<ActionResult> Index(string category, string search, string sortBy, int? page)
         {
             ProductIndexViewModel viewModel = new ProductIndexViewModel();
             
@@ -64,7 +67,11 @@ namespace BabyStore.Controllers.ModelControllers
             }
       
             int currentPage = (page ?? 1);
-            viewModel.Products = products.ToPagedList(currentPage, Constants.PageItems);
+            viewModel.CurrentPage = currentPage;
+            viewModel.TotalNumberOfProducts = products.Count();
+            viewModel.TotalPages = (int)Math.Ceiling((decimal)viewModel.TotalNumberOfProducts / Constants.PageItems);
+            viewModel.currentPageOfProducts = await products.ReturnPages(currentPage, Constants.PageItems);
+
             viewModel.SortBy = sortBy;
             viewModel.Sorts = new Dictionary<string, string>
             {

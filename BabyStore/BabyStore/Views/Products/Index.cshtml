@@ -1,4 +1,5 @@
-﻿@using PagedList.Mvc
+﻿@using BabyStore.HTMLHelpers
+@using PagedList.Mvc
 @model BabyStore.ViewModel.Products.ProductIndexViewModel
 
 @{
@@ -7,7 +8,7 @@
 
 <h2>@ViewBag.Title</h2>
 <p>
-    @(String.IsNullOrWhiteSpace(Model.Search) ? "Showing all" : "You search for " + Model.Search + " found") @Model.Products.TotalItemCount products
+    @(String.IsNullOrWhiteSpace(Model.Search) ? "Showing all" : "You search for " + Model.Search + " found") @Model.TotalNumberOfProducts products
 </p>
 <p>
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))
@@ -34,18 +35,18 @@
             @Html.DisplayNameFor(model => Model.Category)
         </th>
         <th>
-            @Html.DisplayNameFor(model => Model.Products.First().Name)
+            @Html.DisplayNameFor(model => Model.currentPageOfProducts.First().Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => Model.Products.First().Description)
+            @Html.DisplayNameFor(model => Model.currentPageOfProducts.First().Description)
         </th>
         <th>
-            @Html.DisplayNameFor(model => Model.Products.First().Price)
+            @Html.DisplayNameFor(model => Model.currentPageOfProducts.First().Price)
         </th>
         <th></th>
     </tr>
 
-    @foreach (var item in Model.Products)
+    @foreach (var item in Model.currentPageOfProducts)
     {
         <tr>
             <td>
@@ -82,8 +83,7 @@
 </table>
 
 <div align="right">
-    Page @(Model.Products.PageCount < Model.Products.PageNumber ? 0 : Model.Products.PageNumber) of @Model.Products.PageCount
-    @Html.PagedListPager(Model.Products, page => Url.Action("Index",
+    @Html.GeneratePageLinks(Model.CurrentPage, Model.TotalPages, page => Url.Action("Index",
         new
         {
             category = @Model.Category,

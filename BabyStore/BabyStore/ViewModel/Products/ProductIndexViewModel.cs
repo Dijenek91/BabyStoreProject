@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using BabyStore.Models.BabyStoreModelClasses;
 using PagedList;
 
 namespace BabyStore.ViewModel.Products
 {
     public class ProductIndexViewModel
     {
-        public IPagedList<Models.BabyStoreModelClasses.Product> Products { get; set; }
+        public int TotalNumberOfProducts { get; set; }
         public string Search { get; set; }
         public IEnumerable<CategoryWithCount> CatsWithCount { get; set; }
         public string Category { get; set; }
@@ -25,6 +26,11 @@ namespace BabyStore.ViewModel.Products
                 return allCats;
             }
         }
+        #region Paging
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public List<Product> currentPageOfProducts { get; set; }
+        #endregion
     }
 
     public class CategoryWithCount
