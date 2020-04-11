@@ -6,6 +6,7 @@ using System.Net;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
+using Serilog;
 
 namespace BabyStore.Controllers.ModelControllers
 {
@@ -184,6 +185,13 @@ namespace BabyStore.Controllers.ModelControllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
         }
     }
 }
