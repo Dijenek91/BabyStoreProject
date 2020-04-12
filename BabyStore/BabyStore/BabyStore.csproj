@@ -258,6 +258,10 @@
     <Compile Include="Migrations\202004100906054_category_rowversion.Designer.cs">
       <DependentUpon>202004100906054_category_rowversion.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202004111140340_rowVersionAddToProduct.cs" />
+    <Compile Include="Migrations\202004111140340_rowVersionAddToProduct.Designer.cs">
+      <DependentUpon>202004111140340_rowVersionAddToProduct.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\StoreConfiguration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -511,6 +515,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202004100906054_category_rowversion.resx">
       <DependentUpon>202004100906054_category_rowversion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202004111140340_rowVersionAddToProduct.resx">
+      <DependentUpon>202004111140340_rowVersionAddToProduct.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

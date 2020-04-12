@@ -16,7 +16,7 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.ID)
-
+        @Html.HiddenFor(model => model.RowVersion)
         @Html.Partial("_ProductEditCreatePartial", Model)
 
         <div class="form-group">

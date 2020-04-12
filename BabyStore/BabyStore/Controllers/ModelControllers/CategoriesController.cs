@@ -94,7 +94,7 @@ namespace BabyStore.Controllers.ModelControllers
                 Category deletedCategory = new Category();
                 TryUpdateModel(deletedCategory, fieldsToBind);
                 ModelState.AddModelError(string.Empty, "Unable to save your changes because the category has been deleted by another user.");
-                return View(deletedCategory);
+                return View(deletedCategory); 
             }
             if (TryUpdateModel(categoryToUpdate, fieldsToBind))
             {

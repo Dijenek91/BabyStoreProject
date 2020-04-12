@@ -98,3 +98,4 @@ D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.F
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.Console.xml
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.File.pdb
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.File.xml
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.StoreConfigurations.rowVersionAddToProduct.resources

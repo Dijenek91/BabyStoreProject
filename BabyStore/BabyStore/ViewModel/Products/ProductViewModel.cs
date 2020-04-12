@@ -34,5 +34,7 @@ namespace BabyStore.ViewModel.Products
         public List<SelectList> ImageLists { get; set; }
 
         public string[] ProductImages { get; set; }
+
+        public byte[] RowVersion { get; set; }
     }
 }

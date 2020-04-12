@@ -1,6 +1,8 @@
-﻿namespace BabyStore.Models.BabyStoreModelClasses
+﻿using System.Collections;
+
+namespace BabyStore.Models.BabyStoreModelClasses
 {
-    public class ProductImageMapping
+    public class ProductImageMapping : IEqualityComparer
     {
         public int ID { get; set; }
         public int ImageNumber { get; set; }
@@ -9,5 +11,19 @@
 
         public virtual Product Product { get; set; }
         public virtual ProductImage ProductImage { get; set; }
+
+        public bool Equals(object x, object y)
+        {
+            if (((ProductImageMapping)x).ProductImageID != ((ProductImageMapping)y).ProductImageID)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public int GetHashCode(object obj)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

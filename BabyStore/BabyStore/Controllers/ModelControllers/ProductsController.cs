@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using BabyStore.Models.BabyStoreModelClasses;
 using BabyStore.ViewModel.Products;
 using PagedList;
 using BabyStore.Utilities;
+using Serilog;
 
 namespace BabyStore.Controllers.ModelControllers
 {
@@ -167,25 +169,8 @@ namespace BabyStore.Controllers.ModelControllers
                 return HttpNotFound();
             }
 
-            ProductViewModel viewModel = new ProductViewModel();
-            viewModel.Name = product.Name;
-            viewModel.Description = product.Description;
-            viewModel.CategoryID = (int)product.CategoryID;
-            viewModel.Price = product.Price;
+            ProductViewModel viewModel = MapProductToViewModel(product);
 
-            viewModel.CategoryList = new SelectList(db.Categories, "ID", "Name", product.CategoryID);
-            viewModel.ImageLists = new List<SelectList>();
-
-            foreach (var imageMapping in product.ProductImageMappings.OrderBy(pi => pi.ImageNumber))
-            {
-                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName", imageMapping.ProductImageID));
-            }
-            for (int i = viewModel.ImageLists.Count; i < Constants.NumberOfProductImages; i++)
-            {
-                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName"));
-            }
-
-            
             return View(viewModel);
         }
 
@@ -196,60 +181,127 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(ProductViewModel viewModel)
         {
+            string[] fieldsToBind = new string[] { "Name", "Description", "Price", "CategoryID" };
             var productToUpdate = db.Products.Include(p => p.ProductImageMappings).Where(p => p.ID == viewModel.ID).Single();
 
-            if (TryUpdateModel(productToUpdate, "", new string[] {"Name", "Description", "Price", "CategoryID"}))
+            if (productToUpdate == null)
             {
-                if (productToUpdate.ProductImageMappings == null)
+                Product deletedProduct = new Product();
+                TryUpdateModel(deletedProduct, fieldsToBind);
+                ModelState.AddModelError(string.Empty, "Unable to save your changes because the product has been deleted by another user.");
+
+                ProductViewModel outViewModel = MapProductToViewModel(deletedProduct);
+                return View(outViewModel);
+            }
+
+            if (TryUpdateModel(productToUpdate, "", fieldsToBind))
+            {
+                try
                 {
-                    productToUpdate.ProductImageMappings = new List<ProductImageMapping>();
-                }
-                string[] submitedImages = viewModel.ProductImages.Where(pi => !string.IsNullOrEmpty(pi)).ToArray();
-                for (int i = 0; i < submitedImages.Length; i++)
-                {
-                    var imageMappingToEdit = productToUpdate.ProductImageMappings.Where(pi => pi.ImageNumber == i).FirstOrDefault();
-                    var image = db.ProductImages.Find(int.Parse(submitedImages[i]));
-                    
-                    //if there is nothing stored then we need to add a new mapping
-                    if (imageMappingToEdit == null)
+                    if (productToUpdate.ProductImageMappings == null)
                     {
-                        //add image to the imagemappings
-                        productToUpdate.ProductImageMappings.Add(new ProductImageMapping
-                        {
-                            ImageNumber = i,
-                            ProductImage = image,
-                            ProductImageID = image.ID
-                        });
+                        productToUpdate.ProductImageMappings = new List<ProductImageMapping>();
                     }
-                    //else it's not a new file so edit the current mapping
-                    else
+
+                    string[] submitedImages = viewModel.ProductImages.Where(pi => !string.IsNullOrEmpty(pi)).ToArray();
+                    for (int i = 0; i < submitedImages.Length; i++)
                     {
-                        //if they are not the same
-                        if (imageMappingToEdit.ProductImageID != int.Parse(submitedImages[i]))
+                        var imageMappingToEdit =
+                            productToUpdate.ProductImageMappings.Where(pi => pi.ImageNumber == i).FirstOrDefault();
+                        var image = db.ProductImages.Find(int.Parse(submitedImages[i]));
+
+                        //if there is nothing stored then we need to add a new mapping
+                        if (imageMappingToEdit == null)
                         {
-                            //assign image property of the image mapping
-                            imageMappingToEdit.ProductImage = image;
+                            //add image to the imagemappings
+                            productToUpdate.ProductImageMappings.Add(new ProductImageMapping
+                            {
+                                ImageNumber = i,
+                                ProductImage = image,
+                                ProductImageID = image.ID
+                            });
+                        }
+                        //else it's not a new file so edit the current mapping
+                        else
+                        {
+                            //if they are not the same
+                            if (imageMappingToEdit.ProductImageID != int.Parse(submitedImages[i]))
+                            {
+                                //assign image property of the image mapping
+                                imageMappingToEdit.ProductImage = image;
+                            }
                         }
                     }
-                }
-                
-                //remove old images if they differ from new submited iamges on product
-                for (int i = submitedImages.Length; i < Constants.NumberOfProductImages; i++)
-                {
-                    var imageMappingToEdit = productToUpdate.ProductImageMappings.Where(pim => pim.ImageNumber == i).FirstOrDefault();
-                    //if there is something stored in the mapping
-                    if (imageMappingToEdit != null)
+
+                    //remove old images if they differ from new submited iamges on product
+                    for (int i = submitedImages.Length; i < Constants.NumberOfProductImages; i++)
                     {
-                        //delete the record from the mapping table directly.
-                        //just calling productToUpdate.ProductImageMappings.Remove(imageMappingToEdit)
-                        //results in a FK error
-                        db.ProductImageMappings.Remove(imageMappingToEdit);
+                        var imageMappingToEdit =
+                            productToUpdate.ProductImageMappings.Where(pim => pim.ImageNumber == i).FirstOrDefault();
+                        //if there is something stored in the mapping
+                        if (imageMappingToEdit != null)
+                        {
+                            //delete the record from the mapping table directly.
+                            //just calling productToUpdate.ProductImageMappings.Remove(imageMappingToEdit)
+                            //results in a FK error
+                            db.ProductImageMappings.Remove(imageMappingToEdit);
+                        }
                     }
-                }
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                    db.Entry(productToUpdate).OriginalValues["RowVersion"] = viewModel.RowVersion;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
             }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                var exEntry = ex.Entries.Single();
+                var currentUIValues = (Product) exEntry.Entity;
+                var databaseProduct = exEntry.GetDatabaseValues();
+
+                if (databaseProduct == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Unable to save your changes because the category has been deleted by another user.");
+                }
+                else
+                {
+                    var databaseProductValues = (Product)databaseProduct.ToObject();
+                    VerifyProductFields(databaseProductValues, currentUIValues);
+
+                    ModelState.AddModelError(string.Empty, "The record has been modified by another user after you loaded the screen.Your changes have not yet been saved. "
+                    + "The new values in the database are shown below. If you want to overwrite these values with your changes then click save otherwise go back to the categories page.");
+
+                    viewModel = MapProductToViewModel(currentUIValues);
+                    viewModel.RowVersion = databaseProductValues.RowVersion;
+                } 
+            }
+        }
             return View(viewModel);
+        }
+
+        private void VerifyProductFields(Product databaseProductValues, Product currentUIValues)
+        {
+            if (databaseProductValues.Name != currentUIValues.Name)
+            {
+                ModelState.AddModelError("Name", "Current value in database: " + databaseProductValues.Name);
+            }
+            if (databaseProductValues.Description != currentUIValues.Description)
+            {
+                ModelState.AddModelError("Description", "Current value in database: " + databaseProductValues.Description);
+            }
+            if (databaseProductValues.CategoryID != currentUIValues.CategoryID)
+            {
+                ModelState.AddModelError("CategoryID", "Current value in database: " + databaseProductValues.CategoryID);
+            }
+            if (databaseProductValues.Price != currentUIValues.Price)
+            {
+                ModelState.AddModelError("Price", "Current value in database: " + databaseProductValues.Price);
+            }
+            //var dbMapping = databaseProductValues.ProductImageMappings.ToList();//TODO: how do i retrtieve data for image mapping to verify the changes
+            //var uiMapping = currentUIValues.ProductImageMappings.ToList();
+               
+            //if (Enumerable.SequenceEqual(dbMapping, uiMapping))
+            //{
+            //    ModelState.AddModelError("Price", "Current value in database: " + databaseProductValues.Price);
+            //}    
         }
 
         // GET: Products/Delete/5
@@ -298,6 +350,37 @@ namespace BabyStore.Controllers.ModelControllers
         {
             return products.Where(
                 p => p.Name.Contains(search) || p.Category.Name.Contains(search) || p.Description.Contains(search));
+        }
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
+        }
+
+        private ProductViewModel MapProductToViewModel(Product product)
+        {
+            var viewModel = new ProductViewModel();
+            viewModel.Name = product.Name;
+            viewModel.Description = product.Description;
+            viewModel.CategoryID = (int)product.CategoryID;
+            viewModel.Price = product.Price;
+            viewModel.RowVersion = product.RowVersion;
+
+            viewModel.CategoryList = new SelectList(db.Categories, "ID", "Name", product.CategoryID);
+            viewModel.ImageLists = new List<SelectList>();
+
+            foreach (var imageMapping in product.ProductImageMappings.OrderBy(pi => pi.ImageNumber))
+            {
+                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName", imageMapping.ProductImageID));
+            }
+            for (int i = viewModel.ImageLists.Count; i < Constants.NumberOfProductImages; i++)
+            {
+                viewModel.ImageLists.Add(new SelectList(db.ProductImages, "ID", "FileName"));//BUG: db.productImages umesto da vrati listu svih product image-a vrati samo jedan image?
+            }
+
+            return viewModel;
         }
     }
 }

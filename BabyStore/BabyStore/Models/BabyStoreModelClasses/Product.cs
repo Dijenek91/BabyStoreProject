@@ -28,5 +28,8 @@ namespace BabyStore.Models.BabyStoreModelClasses
         public virtual Category Category { get; set; }
 
         public virtual ICollection<ProductImageMapping> ProductImageMappings { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }
