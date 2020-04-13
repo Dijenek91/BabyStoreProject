@@ -305,7 +305,7 @@ namespace BabyStore.Controllers.ModelControllers
         }
 
         // GET: Products/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int? id, bool? deletionError)
         {
             if (id == null)
             {
@@ -314,27 +314,37 @@ namespace BabyStore.Controllers.ModelControllers
             Product product = db.Products.Find(id);
             if (product == null)
             {
+                if (deletionError.GetValueOrDefault())
+                {
+                    return RedirectToAction("Index");
+                }
                 return HttpNotFound();
+            }
+
+            if (deletionError.GetValueOrDefault())
+            {
+                ModelState.AddModelError(string.Empty, "The product you attempted to delete has been modified by another user after you loaded it. " +
+                    "The delete has not been performed.The current values in the database are shown above. " +
+                    "If you still want to delete this record click the Delete button again, otherwise go back to the products page.");
             }
             return View(product);
         }
 
         // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Delete(Product product)
         {
-            Product product = db.Products.Find(id);
-            db.Products.Remove(product);
-
-            var orderLines = db.OrderLines.Where(ol => ol.ProductID == id);
-            foreach (var ol in orderLines)
+            try
             {
-                ol.ProductID = null;
+                db.Entry(product).State = EntityState.Deleted;
+                db.SaveChanges();
+                return RedirectToAction("Index");
             }
-
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            catch (DbUpdateConcurrencyException)
+            {
+                return RedirectToAction("Delete", new { deletionError = true, id = product.ID });
+            }
         }
 
         protected override void Dispose(bool disposing)
