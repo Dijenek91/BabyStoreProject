@@ -282,6 +282,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="RepositoryLayer\GenericRepository.cs" />
+    <Compile Include="RepositoryLayer\GenericUnitOfWork.cs" />
+    <Compile Include="RepositoryLayer\IGenericRepository.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\AsyncPaging.cs" />
     <Compile Include="ViewModel\Basket\BasketSummaryViewModel.cs" />

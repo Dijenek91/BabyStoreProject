@@ -1,0 +1,8 @@
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\bin\Debug\BabyStoreTests.dll
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\bin\Debug\BabyStoreTests.pdb
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\bin\Debug\nunit.framework.dll
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\bin\Debug\nunit.framework.pdb
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\bin\Debug\nunit.framework.xml
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\obj\Debug\BabyStoreTests.csprojResolveAssemblyReference.cache
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\obj\Debug\BabyStoreTests.dll
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStoreTests\obj\Debug\BabyStoreTests.pdb
