@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using BabyStore.DAL;
 
 namespace BabyStore.RepositoryLayer
 {
-    public class GenericRepository<TEntity>:IGenericRepository<TEntity> where TEntity:class
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity>
+        where TEntity:class
     {
         private DbSet<TEntity> _dbSet;
         private StoreContext _dbContext;
@@ -16,9 +18,9 @@ namespace BabyStore.RepositoryLayer
             _dbSet = dbContext.Set<TEntity>();
         } 
 
-        public async Task<IEnumerable<TEntity>> GetAllRecords()
+        public IEnumerable<TEntity> GetAllRecords()
         {
-            return await _dbSet.ToListAsync();
+            return  _dbSet.ToList();
         }
 
         public void Add(TEntity entity)
@@ -32,9 +34,9 @@ namespace BabyStore.RepositoryLayer
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
 
-        public async Task<TEntity> GetFirstOrDefault(int entityId)
+        public TEntity GetById(int? entityId)
         {
-            return await _dbSet.FindAsync(entityId);
+            return _dbSet.Find(entityId);
         }
 
         public void Delete(TEntity entity)

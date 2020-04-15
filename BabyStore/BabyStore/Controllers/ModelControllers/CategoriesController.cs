@@ -6,6 +6,7 @@ using System.Net;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
+using BabyStore.RepositoryLayer.UnitOfWork;
 using Serilog;
 
 namespace BabyStore.Controllers.ModelControllers
@@ -14,12 +15,21 @@ namespace BabyStore.Controllers.ModelControllers
     public class CategoriesController : Controller
     {
         private StoreContext db = new StoreContext();
+        private GenericUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private GenericRepository2<Category> _categoryRepo;
+        private GenericRepository2<Product> _productRepo;
+
+        public CategoriesController()
+        {
+            _categoryRepo = new GenericRepository2<Category>(_unitOfWork);
+            _productRepo = new GenericRepository2<Product>(_unitOfWork);
+        }
 
         // GET: Categories
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View(db.Categories.OrderBy(c => c.Name).ToList());
+            return View(_categoryRepo.GetAllRecords().OrderBy(c => c.Name).ToList());
         }
 
         // GET: Categories/Details/5
@@ -29,7 +39,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
+            Category category = _categoryRepo.GetById(id);
             if (category == null)
             {
                 return HttpNotFound();
@@ -50,11 +60,20 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Name")] Category category)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Categories.Add(category);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                _unitOfWork.CreateTransaction();
+                if (ModelState.IsValid)
+                {
+                    _categoryRepo.Add(category);
+                    _unitOfWork.Save();
+                    _unitOfWork.Commit();
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
             }
 
             return View(category);
@@ -67,7 +86,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
+            Category category = _categoryRepo.GetById(id);
             if (category == null)
             {
                 return HttpNotFound();
@@ -136,7 +155,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
+            Category category = _categoryRepo.GetById(id);
             if (category == null)
             {
                 if (deletionError.GetValueOrDefault())
@@ -162,18 +181,23 @@ namespace BabyStore.Controllers.ModelControllers
         {
             try
             {
-                db.Entry(category).State = EntityState.Deleted;
-                var products = db.Products.Where(p => p.CategoryID == category.ID);
+                _unitOfWork.CreateTransaction();
+                category = _categoryRepo.GetById(category.ID);
+                //db.Entry(category).State = EntityState.Deleted;
+                _categoryRepo.Delete(category);
+                var products = _productRepo.GetAllRecords().Where(p => p.CategoryID == category.ID);
                 foreach (var product in products)
                 {
                     product.CategoryID = null;
                 }
 
-                db.SaveChanges();
+                _unitOfWork.Save();
+                _unitOfWork.Commit();
                 return RedirectToAction("Index");
             }
             catch (DbUpdateConcurrencyException)
             {
+                _unitOfWork.Rollback();
                 return RedirectToAction("Delete", new { deletionError = true, id = category.ID });
             }
         }
