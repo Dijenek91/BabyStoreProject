@@ -3,9 +3,11 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
+using BabyStore.RepositoryLayer;
 using BabyStore.RepositoryLayer.UnitOfWork;
 using Serilog;
 
@@ -15,14 +17,14 @@ namespace BabyStore.Controllers.ModelControllers
     public class CategoriesController : Controller
     {
         private StoreContext db = new StoreContext();
-        private GenericUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
-        private GenericRepository2<Category> _categoryRepo;
-        private GenericRepository2<Product> _productRepo;
+        private IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private IGenericRepository<Category> _categoryRepo;
+        private IGenericRepository<Product> _productRepo;
 
         public CategoriesController()
         {
-            _categoryRepo = new GenericRepository2<Category>(_unitOfWork);
-            _productRepo = new GenericRepository2<Product>(_unitOfWork);
+            _categoryRepo = _unitOfWork.GenericRepository<Category>();
+            _productRepo = _unitOfWork.GenericRepository<Product>();
         }
 
         // GET: Categories
@@ -39,7 +41,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = _categoryRepo.GetById(id);
+            Category category = _categoryRepo.Find(id);
             if (category == null)
             {
                 return HttpNotFound();
@@ -60,20 +62,12 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "ID,Name")] Category category)
         {
-            try
+       
+            if (ModelState.IsValid)
             {
-                _unitOfWork.CreateTransaction();
-                if (ModelState.IsValid)
-                {
-                    _categoryRepo.Add(category);
-                    _unitOfWork.Save();
-                    _unitOfWork.Commit();
-                    return RedirectToAction("Index");
-                }
-            }
-            catch (Exception ex)
-            {
-                _unitOfWork.Rollback();
+                _categoryRepo.Add(category);
+                _unitOfWork.Save();
+                return RedirectToAction("Index");
             }
 
             return View(category);
@@ -86,7 +80,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = _categoryRepo.GetById(id);
+            Category category = _categoryRepo.Find(id);
             if (category == null)
             {
                 return HttpNotFound();
@@ -107,7 +101,7 @@ namespace BabyStore.Controllers.ModelControllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var categoryToUpdate = db.Categories.Find(id);
+            var categoryToUpdate = _categoryRepo.Find(id);
             if (categoryToUpdate == null)
             {
                 Category deletedCategory = new Category();
@@ -117,35 +111,25 @@ namespace BabyStore.Controllers.ModelControllers
             }
             if (TryUpdateModel(categoryToUpdate, fieldsToBind))
             {
-                try
-                {
-                    db.Entry(categoryToUpdate).OriginalValues["RowVersion"] = rowVersion;
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    var exEntry = ex.Entries.Single();
-                    var currentUIValues = (Category)exEntry.Entity;
-                    var databaseCategory = exEntry.GetDatabaseValues();
-                    if (databaseCategory == null)
-                    {
-                        ModelState.AddModelError(string.Empty, "Unable to save your changes because the category has been deleted by another user.");
-                    }
-                    else
-                    {
-                        var databaseCategoryValues = (Category)databaseCategory.ToObject();
-                        if (databaseCategoryValues.Name != currentUIValues.Name)
-                        {
-                            ModelState.AddModelError("Name", "Current value in database: " + databaseCategoryValues.Name);
-                        }
-                        ModelState.AddModelError(string.Empty, "The record has been modified by another user after you loaded the screen.Your changes have not yet been saved. "
-                        + "The new values in the database are shown below. If you want to overwrite these values with your changes then click save otherwise go back to the categories page.");
-                        categoryToUpdate.RowVersion = databaseCategoryValues.RowVersion;
-                    }
-                }
+                _categoryRepo.SetOriginalValueRowVersion(categoryToUpdate, rowVersion);
+                if(_unitOfWork.Save(ModelState, categoryToUpdate, VerifyCategory))
+                        return RedirectToAction("Index");
+                return View(categoryToUpdate);
             }
+
             return View(categoryToUpdate);
+        }
+
+        public void VerifyCategory(Category databaseCategory, Category uiFilledCategory, Category categoryToUpdate)
+        {
+            if (databaseCategory.Name != uiFilledCategory.Name)
+            {
+                ModelState.AddModelError("Name", "Current value in database: " + databaseCategory.Name);
+            }
+
+            ModelState.AddModelError(string.Empty, "The record has been modified by another user after you loaded the screen.Your changes have not yet been saved. "
+            + "The new values in the database are shown below. If you want to overwrite these values with your changes then click save otherwise go back to the categories page.");
+            categoryToUpdate.RowVersion = databaseCategory.RowVersion;
         }
 
         // GET: Categories/Delete/5
@@ -155,7 +139,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = _categoryRepo.GetById(id);
+            Category category = _categoryRepo.Find(id);
             if (category == null)
             {
                 if (deletionError.GetValueOrDefault())
@@ -181,9 +165,7 @@ namespace BabyStore.Controllers.ModelControllers
         {
             try
             {
-                _unitOfWork.CreateTransaction();
-                category = _categoryRepo.GetById(category.ID);
-                //db.Entry(category).State = EntityState.Deleted;
+                category = _categoryRepo.Find(category.ID);
                 _categoryRepo.Delete(category);
                 var products = _productRepo.GetAllRecords().Where(p => p.CategoryID == category.ID);
                 foreach (var product in products)
@@ -192,12 +174,11 @@ namespace BabyStore.Controllers.ModelControllers
                 }
 
                 _unitOfWork.Save();
-                _unitOfWork.Commit();
+                
                 return RedirectToAction("Index");
             }
             catch (DbUpdateConcurrencyException)
             {
-                _unitOfWork.Rollback();
                 return RedirectToAction("Delete", new { deletionError = true, id = category.ID });
             }
         }

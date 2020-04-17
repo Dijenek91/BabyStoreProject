@@ -283,7 +283,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="RepositoryLayer\GenericRepository.cs" />
-    <Compile Include="RepositoryLayer\UnitOfWork\GenericRepository2.cs" />
     <Compile Include="RepositoryLayer\UnitOfWork\GenericUnitOfWork.cs" />
     <Compile Include="RepositoryLayer\IGenericRepository.cs" />
     <Compile Include="RepositoryLayer\UnitOfWork\IUnitOfWork.cs" />
