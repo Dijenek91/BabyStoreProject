@@ -9,7 +9,7 @@ using BabyStore.Models.BabyStoreModelClasses;
 
 namespace BabyStore.RepositoryLayer.UnitOfWork
 {
-    public class GenericUnitOfWork<TContext> : IUnitOfWork<TContext>, IDisposable
+    public class GenericUnitOfWork<TContext> : IUnitOfWork<TContext>
         where TContext: DbContext, new()
     {
         private readonly TContext _dbContext; 
@@ -91,7 +91,7 @@ namespace BabyStore.RepositoryLayer.UnitOfWork
                 var databaseCategory = exEntry.GetDatabaseValues();
                 if (databaseCategory == null)
                 {
-                    modelState.AddModelError(string.Empty, "Unable to save your changes because the category has been deleted by another user.");
+                    modelState.AddModelError(string.Empty, "Unable to save your changes because the entity has been deleted by another user.");
                 }
                 else
                 {

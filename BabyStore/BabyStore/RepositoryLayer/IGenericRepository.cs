@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace BabyStore.RepositoryLayer
 {
@@ -16,5 +16,7 @@ namespace BabyStore.RepositoryLayer
         void Delete(TEntity entity);
 
         void SetOriginalValueRowVersion(TEntity entity, byte[] rowVersion);
+
+        IQueryable<TEntity> GetTable();
     }
 }

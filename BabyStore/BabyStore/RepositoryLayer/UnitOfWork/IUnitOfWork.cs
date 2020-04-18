@@ -1,11 +1,12 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Web.Mvc;
 
 namespace BabyStore.RepositoryLayer.UnitOfWork
 {
-    public delegate void VerifyEntityAndSetRowVersion<TEntity>(TEntity databaseCategoryValues, TEntity currentUIValues, TEntity categoryToUpdate);
+    public delegate void VerifyEntityAndSetRowVersion<TEntity>(TEntity databaseEntityValues, TEntity uiFilledEntityValues, TEntity returnModel);
 
-    public interface IUnitOfWork<out TContext>
+    public interface IUnitOfWork<out TContext>: IDisposable
         where TContext : DbContext, new()
     {
         TContext Context { get; }

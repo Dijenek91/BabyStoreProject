@@ -16,7 +16,6 @@ namespace BabyStore.Controllers.ModelControllers
     [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
-        private StoreContext db = new StoreContext();
         private IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
         private IGenericRepository<Category> _categoryRepo;
         private IGenericRepository<Product> _productRepo;
@@ -31,7 +30,7 @@ namespace BabyStore.Controllers.ModelControllers
         [AllowAnonymous]
         public ActionResult Index()
         {
-            return View(_categoryRepo.GetAllRecords().OrderBy(c => c.Name).ToList());
+            return View(_categoryRepo.GetTable().OrderBy(c => c.Name).ToList());
         }
 
         // GET: Categories/Details/5
@@ -167,7 +166,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 category = _categoryRepo.Find(category.ID);
                 _categoryRepo.Delete(category);
-                var products = _productRepo.GetAllRecords().Where(p => p.CategoryID == category.ID);
+                var products = _productRepo.GetTable().Where(p => p.CategoryID == category.ID);
                 foreach (var product in products)
                 {
                     product.CategoryID = null;
@@ -183,20 +182,17 @@ namespace BabyStore.Controllers.ModelControllers
             }
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         protected override void OnException(ExceptionContext filterContext)
         {
             Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
             Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
             base.OnException(filterContext);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _unitOfWork.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

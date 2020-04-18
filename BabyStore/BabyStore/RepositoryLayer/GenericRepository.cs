@@ -21,15 +21,16 @@ namespace BabyStore.RepositoryLayer
         public GenericRepository(IUnitOfWork<StoreContext> unitOfWork) : this(unitOfWork.Context)
         {
         }
+
         public GenericRepository(StoreContext context)
         {
             _isDisposed = false;
             Context = context;
         }
         
-        public virtual IQueryable<TEntity> Table
+        public virtual IQueryable<TEntity> GetTable()
         {
-            get { return Entities; }
+            return Entities;
         }
 
         public virtual void SetOriginalValueRowVersion(TEntity entity, byte[] rowVersion)
