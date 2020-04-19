@@ -33,6 +33,11 @@ namespace BabyStore.RepositoryLayer
             return Entities;
         }
 
+        public virtual void DetachEntry(TEntity entity)
+        {
+            Context.Entry(entity).State = EntityState.Detached;
+        }
+
         public virtual void SetOriginalValueRowVersion(TEntity entity, byte[] rowVersion)
         {
             Context.Entry(entity).OriginalValues["RowVersion"] = rowVersion;

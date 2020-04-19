@@ -247,31 +247,6 @@ namespace BabyStore.Controllers.ModelControllers
             return View(viewModel);
         }
 
-        private ProductViewModel SetViewModel(ProductViewModel viewModel, Product productToUpdate)
-        {
-            var retViewModel = new ProductViewModel();
-            retViewModel.Name = viewModel.Name;
-            retViewModel.Description = viewModel.Description;
-            retViewModel.CategoryID = (int)viewModel.CategoryID;
-            retViewModel.Price = viewModel.Price;
-            retViewModel.RowVersion = productToUpdate.RowVersion;
-
-            retViewModel.CategoryList = new SelectList(_categoryRepo.GetTable(), "ID", "Name", viewModel.CategoryID);
-            retViewModel.ImageLists = new List<SelectList>();
-
-            var allProductImages = _productImageRepo.GetTable();
-            foreach (var imageMapping in productToUpdate.ProductImageMappings.OrderBy(pi => pi.ImageNumber))
-            {
-                retViewModel.ImageLists.Add(new SelectList(allProductImages, "ID", "FileName", imageMapping.ProductImageID));
-            }
-            for (int i = retViewModel.ImageLists.Count; i < Constants.NumberOfProductImages; i++)
-            {
-                retViewModel.ImageLists.Add(new SelectList(allProductImages, "ID", "FileName"));//BUG: db.productImages instead of returning a list of productImages, he returns a list with selected image, check front end, this line seems fine
-            }
-
-            return retViewModel;
-        }
-
         private void VerifyProductFields(Product databaseProductValues, Product uiFilledProductValues, Product productToUpdate)
         {
             if (databaseProductValues.Name != uiFilledProductValues.Name)
@@ -348,6 +323,7 @@ namespace BabyStore.Controllers.ModelControllers
         }
         
         #region Private methods
+
         private static IQueryable<Product> SearchProductsFor(string search, IQueryable<Product> products)
         {
             return products.Where(
@@ -370,12 +346,29 @@ namespace BabyStore.Controllers.ModelControllers
                                       };
         }
 
-
-        protected override void OnException(ExceptionContext filterContext)
+        private ProductViewModel SetViewModel(ProductViewModel viewModel, Product productToUpdate)
         {
-            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
-            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
-            base.OnException(filterContext);
+            var retViewModel = new ProductViewModel();
+            retViewModel.Name = viewModel.Name;
+            retViewModel.Description = viewModel.Description;
+            retViewModel.CategoryID = (int)viewModel.CategoryID;
+            retViewModel.Price = viewModel.Price;
+            retViewModel.RowVersion = productToUpdate.RowVersion;
+
+            retViewModel.CategoryList = new SelectList(_categoryRepo.GetTable(), "ID", "Name", viewModel.CategoryID);
+            retViewModel.ImageLists = new List<SelectList>();
+
+            var allProductImages = _productImageRepo.GetTable();
+            foreach (var imageMapping in productToUpdate.ProductImageMappings.OrderBy(pi => pi.ImageNumber))
+            {
+                retViewModel.ImageLists.Add(new SelectList(allProductImages, "ID", "FileName", imageMapping.ProductImageID));
+            }
+            for (int i = retViewModel.ImageLists.Count; i < Constants.NumberOfProductImages; i++)
+            {
+                retViewModel.ImageLists.Add(new SelectList(allProductImages, "ID", "FileName"));//BUG: db.productImages instead of returning a list of productImages, he returns a list with selected image, check front end, this line seems fine
+            }
+
+            return retViewModel;
         }
 
         private ProductViewModel MapProductToViewModel(Product product)
@@ -444,6 +437,14 @@ namespace BabyStore.Controllers.ModelControllers
             _unitOfWork.Dispose();
             base.Dispose(disposing);
         }
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
+        }
+
 
         #endregion
     }

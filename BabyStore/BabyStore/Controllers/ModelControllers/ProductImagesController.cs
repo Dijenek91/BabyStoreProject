@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
@@ -9,17 +10,31 @@ using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.FileOperations;
 using BabyStore.Models.BabyStoreModelClasses;
+using BabyStore.RepositoryLayer;
+using BabyStore.RepositoryLayer.UnitOfWork;
 
 namespace BabyStore.Controllers.ModelControllers
 {
     public class ProductImagesController : Controller
     {
-        private StoreContext db = new StoreContext();
+        private readonly IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private readonly IGenericRepository<ProductImage> _productImageRepo;
+
+        public ProductImagesController()
+        {
+            _productImageRepo = _unitOfWork.GenericRepository<ProductImage>();
+        }
+
+        public ProductImagesController(IUnitOfWork<StoreContext> unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+            _productImageRepo = _unitOfWork.GenericRepository<ProductImage>();
+        }
 
         // GET: ProductImages
         public ActionResult Index()
         {
-            return View(db.ProductImages.ToList());
+            return View(_productImageRepo.GetAllRecords());
         }
 
         // GET: ProductImages/Create
@@ -35,112 +50,63 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult Upload(HttpPostedFileBase[] files)
         {
-            bool allValid = true;
-            string inValidFiles = "";
-            //check the user has entered a file
-            if (files[0] != null)
+            if (!ModelState.IsValid)
             {
-                //if the user has entered less than ten files
-                if (files.Length <= 10)
+                return View();
+            }
+
+            FileHandler.SaveFiles(files, ModelState);
+
+            bool duplicates = false;
+            bool otherDbError = false;
+            string duplicateFiles = "";
+
+            foreach (var file in files)
+            {
+                //try and save each file
+                var imageToAdd = new ProductImage {FileName = file.FileName};
+                try
                 {
-                    //check they are all valid
-                    foreach (var file in files)
+                    _productImageRepo.Add(imageToAdd);
+                    _unitOfWork.Save();
+                }
+                    //if there is an exception check if it is caused by a duplicate file
+                catch (DbUpdateException ex)
+                {
+                    SqlException innerException = ex.InnerException.InnerException as SqlException;
+                    if (innerException != null && innerException.Number == 2601)
                     {
-                        if (!FileHandler.ValidateFile(file))
-                        {
-                            allValid = false;
-                            inValidFiles += ", " + file.FileName;
-                        }
+                        duplicateFiles += ", " + file.FileName;
+                        duplicates = true;
+                        _productImageRepo.DetachEntry(imageToAdd);
                     }
-                    //if they are all valid then try to save them to disk
-                    if (allValid)
-                    {
-                        foreach (var file in files)
-                        {
-                            try
-                            {
-                                FileHandler.SaveFileToDisk(file);
-                            }
-                            catch (Exception)
-                            {
-                                ModelState.AddModelError("FileName",
-                                    "Sorry an error occurred saving the files to disk, please try again");
-                            }
-                        }
-                    }
-                    //else add an error listing out the invalid files
                     else
                     {
-                        ModelState.AddModelError("FileName",
-                            "All files must be gif, png, jpeg or jpg and less than 2MB in size.The following files" +
-                            inValidFiles + " are not valid");
+                        otherDbError = true;
                     }
                 }
-                //the user has entered more than 10 files
-                else
-                {
-                    ModelState.AddModelError("FileName", "Please only upload up to ten files at a time");
-                }
             }
-            else
+            //add a list of duplicate files to the error message
+            if (duplicates)
             {
-                //if the user has not entered a file return an error message
-                ModelState.AddModelError("FileName", "Please choose a file");
+                ModelState.AddModelError("FileName", "All files uploaded except the files" +
+                                                        duplicateFiles + ", which already exist in the system." +
+                                                        " Please delete them and try again if you wish to re - add them");
+                return View();
             }
 
-         
-            if (ModelState.IsValid)
+            if (otherDbError)
             {
-                bool duplicates = false;
-                bool otherDbError = false;
-                string duplicateFiles = "";
-
-                foreach (var file in files)
-                {
-                    //try and save each file
-                    var productToAdd = new ProductImage {FileName = file.FileName};
-                    try
-                    {
-                        db.ProductImages.Add(productToAdd);
-                        db.SaveChanges();
-                    }
-                        //if there is an exception check if it is caused by a duplicate file
-                    catch (DbUpdateException ex)
-                    {
-                        SqlException innerException = ex.InnerException.InnerException as SqlException;
-                        if (innerException != null && innerException.Number == 2601)
-                        {
-                            duplicateFiles += ", " + file.FileName;
-                            duplicates = true;
-                            db.Entry(productToAdd).State = EntityState.Detached;
-                        }
-                        else
-                        {
-                            otherDbError = true;
-                        }
-                    }
-                }
-                //add a list of duplicate files to the error message
-                if (duplicates)
-                {
-                    ModelState.AddModelError("FileName", "All files uploaded except the files" +
-                                                            duplicateFiles + ", which already exist in the system." +
-                                                            " Please delete them and try again if you wish to re - add them");
-                    return View();
-                }
-                else if (otherDbError)
-                {
-                    ModelState.AddModelError("FileName",
-                        "Sorry an error has occurred saving to the database, please try again");
-                    return View();
-                }
-                return RedirectToAction("Index");
+                ModelState.AddModelError("FileName",
+                    "Sorry an error has occurred saving to the database, please try again");
+                return View();
             }
+            return RedirectToAction("Index");
 
-            return View();
         }
 
        
+
         // GET: ProductImages/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -148,7 +114,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ProductImage productImage = db.ProductImages.Find(id);
+            ProductImage productImage = _productImageRepo.Find(id);
             if (productImage == null)
             {
                 return HttpNotFound();
@@ -161,12 +127,25 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            ProductImage productImage = db.ProductImages.Find(id);
-            var mappings = db.ProductImageMappings.Where(pim => pim.ProductImageID == id).ToList();
+            ProductImage productImage = _productImageRepo.Find(id);
+            var imageMappingTable = _unitOfWork.GenericRepository<ProductImageMapping>().GetTable();
 
+            var mappings = imageMappingTable.Where(pim => pim.ProductImageID == id).ToList();
+
+            SortImageNumbers(mappings, imageMappingTable);
+
+            FileHandler.DeleteFile(productImage, Request);
+
+            _productImageRepo.Delete(productImage);
+            _unitOfWork.Save();
+            return RedirectToAction("Index");
+        }
+
+        private static void SortImageNumbers(List<ProductImageMapping> mappings, IQueryable<ProductImageMapping> imageMappingTable)
+        {
             foreach (var mapping in mappings)
             {
-                var mappingsToUpdate = db.ProductImageMappings.Where(pim => pim.ProductID == mapping.ProductID);
+                var mappingsToUpdate = imageMappingTable.Where(pim => pim.ProductID == mapping.ProductID);
 
                 foreach (var productMapping in mappingsToUpdate)
                 {
@@ -176,21 +155,11 @@ namespace BabyStore.Controllers.ModelControllers
                     }
                 }
             }
-
-            System.IO.File.Delete(Request.MapPath(Constants.ProductImagePath + productImage.FileName));
-            System.IO.File.Delete(Request.MapPath(Constants.ProductThumbnailPath + productImage.FileName));
-
-            db.ProductImages.Remove(productImage);
-            db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
+            _unitOfWork.Dispose();
             base.Dispose(disposing);
         }
     }

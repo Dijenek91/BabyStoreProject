@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -10,6 +9,8 @@ using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
 using BabyStore.Models.Orders;
+using BabyStore.RepositoryLayer;
+using BabyStore.RepositoryLayer.UnitOfWork;
 using BabyStore.Utilities;
 using Microsoft.AspNet.Identity.Owin;
 
@@ -18,8 +19,22 @@ namespace BabyStore.Controllers.ModelControllers
     [Authorize]
     public class OrdersController : Controller
     {
-        private StoreContext db = new StoreContext();
+        private readonly IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private readonly IGenericRepository<Order> _ordersRepo;
         private ApplicationUserManager _userManager;
+        
+        #region Constructor
+        public OrdersController()
+        {
+            _ordersRepo = _unitOfWork.GenericRepository<Order>();
+        }
+
+        public OrdersController(IUnitOfWork<StoreContext>  unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+            _ordersRepo = _unitOfWork.GenericRepository<Order>();
+        }
+        #endregion
 
         public ApplicationUserManager UserManager
         {
@@ -37,69 +52,18 @@ namespace BabyStore.Controllers.ModelControllers
         // GET: Orders
         public async Task<ActionResult> Index(string orderSearch, string startDate, string endDate, string orderSortOrder, int? page)
         {
-            var orders = db.Orders.OrderBy(o => o.DateCreated).Include(o => o.OrderLines);
-            if (!User.IsInRole("Admin"))
-            {
-                orders = orders.Where(o => o.UserID == User.Identity.Name);
-            }
-            if (!string.IsNullOrWhiteSpace(orderSearch))
-            {
-                orders = orders.Where(o => o.OrderID.ToString().Equals(orderSearch) ||
-                            o.UserID.Contains(orderSearch) || 
-                            o.DeliveryName.Contains(orderSearch) ||
-                            o.DeliveryAddress.AddressLine1.Contains(orderSearch) ||
-                            o.DeliveryAddress.AddressLine2.Contains(orderSearch) ||
-                            o.DeliveryAddress.Town.Contains(orderSearch) ||
-                            o.DeliveryAddress.County.Contains(orderSearch) ||
-                            o.DeliveryAddress.Postcode.Contains(orderSearch) ||
-                            o.TotalPrice.ToString().Equals(orderSearch) ||
-                            o.OrderLines.Any(ol => ol.ProductName.Contains(orderSearch)));
-            }
-            DateTime parsedStartDate;
-            if (DateTime.TryParse(startDate, out parsedStartDate))
-            {
-                orders = orders.Where(o => o.DateCreated >= parsedStartDate);
-            }
-            DateTime parsedEndDate;
-            if (DateTime.TryParse(endDate, out parsedEndDate))
-            {
-                orders = orders.Where(o => o.DateCreated <= parsedEndDate);
-            }
+            var orders = _ordersRepo.GetTable().OrderBy(o => o.DateCreated).Include(o => o.OrderLines);
+            orders = GetTheOrdersForThisUser(orders);
+            orders = SearchOrders(orders, orderSearch);
+            orders = SelectOrdersBetweenDates(orders, startDate, endDate);
 
-            ViewBag.DateSort = string.IsNullOrEmpty(orderSortOrder) ? "date" : "";
-            ViewBag.UserSort = orderSortOrder == "user" ? "user_desc" : "user";
-            ViewBag.PriceSort = orderSortOrder == "price" ? "price_desc" : "price";
-            ViewBag.CurrentOrderSearch = orderSearch;
-            ViewBag.StartDate = startDate;
-            ViewBag.EndDate = endDate;
+            PopulateViewBag(orderSearch, startDate, endDate, orderSortOrder);
 
-            switch (orderSortOrder)
-            {
-                case "user":
-                    orders = orders.OrderBy(o => o.UserID);
-                    break;
-                case "user_desc":
-                    orders = orders.OrderByDescending(o => o.UserID);
-                    break;
-                case "price":
-                    orders = orders.OrderBy(o => o.TotalPrice);
-                    break;
-                case "price_desc":
-                    orders = orders.OrderByDescending(o => o.TotalPrice);
-                    break;
-                case "date":
-                    orders = orders.OrderBy(o => o.DateCreated);
-                    break;
-                default:
-                    orders = orders.OrderByDescending(o => o.DateCreated);
-                    break;
-            }
+            orders = SortOrders(orderSortOrder, orders);
 
-            int currentPage = (page ?? 1);
-            ViewBag.CurrentPage = currentPage;
-            ViewBag.TotalPages = (int)Math.Ceiling((decimal)orders.Count() / Constants.PageItems);
-            var currentPageOfOrders = await orders.ReturnPages(currentPage, Constants.PageItems);
+            var currentPageOfOrders = await GetCurrentPageOfOrders(page, orders);
             ViewBag.CurrentSortOrder = orderSortOrder;
+
             return View(currentPageOfOrders);
         }
 
@@ -110,7 +74,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Include(o => o.OrderLines).Where(o => o.OrderID == id).SingleOrDefault();
+            Order order = _ordersRepo.GetTable().Include(o => o.OrderLines).SingleOrDefault(o => o.OrderID == id);
             if (order == null)
             {
                 return HttpNotFound();
@@ -139,14 +103,7 @@ namespace BabyStore.Controllers.ModelControllers
 
             foreach (var line in basket.GetBasketLines())
             {
-                OrderLine orderLine = new OrderLine()
-                {
-                    ProductID = line.ProductID,
-                    Product = line.Product,
-                    ProductName = line.Product.Name,
-                    Quantity = line.Quantity,
-                    UnitPrice = line.Product.Price
-                };
+                var orderLine = CreateOrderLine(line);
                 order.OrderLines.Add(orderLine);
             }
 
@@ -164,12 +121,12 @@ namespace BabyStore.Controllers.ModelControllers
             if (ModelState.IsValid)
             {
                 order.DateCreated = DateTime.Now;
-                db.Orders.Add(order);
-                db.SaveChanges();
+                _ordersRepo.Add(order);
+                _unitOfWork.Save();//TODO: this save might be to much?
                 //add the orderlines to the database after creating the order
                 Basket basket = Basket.GetBasket();
                 order.TotalPrice = basket.CreateOrderLines(order.OrderID);
-                db.SaveChanges();
+                _unitOfWork.Save();
                 return RedirectToAction("Details", new { id = order.OrderID });
             }
 
@@ -183,7 +140,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Find(id);
+            Order order = _ordersRepo.Find(id);
             if (order == null)
             {
                 return HttpNotFound();
@@ -200,8 +157,8 @@ namespace BabyStore.Controllers.ModelControllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(order).State = EntityState.Modified;
-                db.SaveChanges();
+                _ordersRepo.Update(order);
+                _unitOfWork.Save();
                 return RedirectToAction("Index");
             }
             return View(order);
@@ -214,7 +171,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Find(id);
+            Order order = _ordersRepo.Find(id);
             if (order == null)
             {
                 return HttpNotFound();
@@ -227,18 +184,120 @@ namespace BabyStore.Controllers.ModelControllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Order order = db.Orders.Find(id);
-            db.Orders.Remove(order);
-            db.SaveChanges();
+            Order order = _ordersRepo.Find(id);
+            _ordersRepo.Delete(order);
+            _unitOfWork.Save();
             return RedirectToAction("Index");
         }
 
+        #region Private methods
+
+        private IQueryable<Order> GetTheOrdersForThisUser(IQueryable<Order> orders)
+        {
+            if (!User.IsInRole("Admin"))
+            {
+                orders = orders.Where(o => o.UserID == User.Identity.Name);
+            }
+            return orders;
+        }
+
+        private static IQueryable<Order> SearchOrders(IQueryable<Order> orders, string orderSearch)
+        {
+            if (!string.IsNullOrWhiteSpace(orderSearch))
+            {
+                orders = orders.Where(o => o.OrderID.ToString().Equals(orderSearch) ||
+                                           o.UserID.Contains(orderSearch) ||
+                                           o.DeliveryName.Contains(orderSearch) ||
+                                           o.DeliveryAddress.AddressLine1.Contains(orderSearch) ||
+                                           o.DeliveryAddress.AddressLine2.Contains(orderSearch) ||
+                                           o.DeliveryAddress.Town.Contains(orderSearch) ||
+                                           o.DeliveryAddress.County.Contains(orderSearch) ||
+                                           o.DeliveryAddress.Postcode.Contains(orderSearch) ||
+                                           o.TotalPrice.ToString().Equals(orderSearch) ||
+                                           o.OrderLines.Any(ol => ol.ProductName.Contains(orderSearch)));
+            }
+            return orders;
+        }
+
+        private static IQueryable<Order> SelectOrdersBetweenDates(IQueryable<Order> orders, string startDate, string endDate)
+        {
+            DateTime parsedStartDate;
+            if (DateTime.TryParse(startDate, out parsedStartDate))
+            {
+                orders = orders.Where(o => o.DateCreated >= parsedStartDate);
+            }
+            DateTime parsedEndDate;
+            if (DateTime.TryParse(endDate, out parsedEndDate))
+            {
+                orders = orders.Where(o => o.DateCreated <= parsedEndDate);
+            }
+            return orders;
+        }
+
+        private void PopulateViewBag(string orderSearch, string startDate, string endDate, string orderSortOrder)
+        {
+            ViewBag.DateSort = string.IsNullOrEmpty(orderSortOrder) ? "date" : "";
+            ViewBag.UserSort = orderSortOrder == "user" ? "user_desc" : "user";
+            ViewBag.PriceSort = orderSortOrder == "price" ? "price_desc" : "price";
+            ViewBag.CurrentOrderSearch = orderSearch;
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
+        }
+
+        private static IQueryable<Order> SortOrders(string orderSortOrder, IQueryable<Order> orders)
+        {
+            switch (orderSortOrder)
+            {
+                case "user":
+                    orders = orders.OrderBy(o => o.UserID);
+                    break;
+                case "user_desc":
+                    orders = orders.OrderByDescending(o => o.UserID);
+                    break;
+                case "price":
+                    orders = orders.OrderBy(o => o.TotalPrice);
+                    break;
+                case "price_desc":
+                    orders = orders.OrderByDescending(o => o.TotalPrice);
+                    break;
+                case "date":
+                    orders = orders.OrderBy(o => o.DateCreated);
+                    break;
+                default:
+                    orders = orders.OrderByDescending(o => o.DateCreated);
+                    break;
+            }
+            return orders;
+        }
+
+        private async Task<List<Order>> GetCurrentPageOfOrders(int? page, IQueryable<Order> orders)
+        {
+            int currentPage = (page ?? 1);
+            ViewBag.CurrentPage = currentPage;
+            ViewBag.TotalPages = (int)Math.Ceiling((decimal)orders.Count() / Constants.PageItems);
+            var currentPageOfOrders = await orders.ReturnPages(currentPage, Constants.PageItems);
+            return currentPageOfOrders;
+        }
+
+        private static OrderLine CreateOrderLine(BasketLine line)
+        {
+            OrderLine orderLine = new OrderLine()
+            {
+                ProductID = line.ProductID,
+                Product = line.Product,
+                ProductName = line.Product.Name,
+                Quantity = line.Quantity,
+                UnitPrice = line.Product.Price
+            };
+            return orderLine;
+        }
+
+
+        #endregion
+
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
+            _unitOfWork.Dispose();
             base.Dispose(disposing);
         }
     }

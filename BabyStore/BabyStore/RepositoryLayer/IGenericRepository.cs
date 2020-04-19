@@ -15,8 +15,11 @@ namespace BabyStore.RepositoryLayer
 
         void Delete(TEntity entity);
 
+        void DetachEntry(TEntity entity);
+
         void SetOriginalValueRowVersion(TEntity entity, byte[] rowVersion);
 
         IQueryable<TEntity> GetTable();
+
     }
 }
