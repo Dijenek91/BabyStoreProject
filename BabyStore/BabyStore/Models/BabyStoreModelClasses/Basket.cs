@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using BabyStore.DAL;
 using BabyStore.Models.Orders;
+using BabyStore.RepositoryLayer;
+using BabyStore.RepositoryLayer.UnitOfWork;
 
 namespace BabyStore.Models.BabyStoreModelClasses
 {
@@ -12,6 +14,14 @@ namespace BabyStore.Models.BabyStoreModelClasses
         private string BasketID { get; set; }
         private const string BasketSessionKey = "BasketID";
         private StoreContext db = new StoreContext();
+        private readonly IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private readonly IGenericRepository<BasketLine> _basketLineRepo;
+         
+        public Basket()
+        {
+            _basketLineRepo = _unitOfWork.GenericRepository<BasketLine>();
+        }
+
 
         public static Basket GetBasket()
         {
@@ -27,18 +37,18 @@ namespace BabyStore.Models.BabyStoreModelClasses
             {
                 basketLine = new BasketLine();
                 basketLine.ProductID = productID;
-                basketLine.Product = db.Products.Find(productID);
+                basketLine.Product = _unitOfWork.GenericRepository<Product>().Find(productID);
                 basketLine.BasketID = BasketID;
                 basketLine.DateCreated = DateTime.Now;
                 basketLine.Quantity = quantity;
 
-                db.BasketLines.Add(basketLine);
+                _basketLineRepo.Add(basketLine);
             }
             else
             {
                 basketLine.Quantity += quantity;
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
         }
 
         public void RemoveLine(int productID)
@@ -46,9 +56,9 @@ namespace BabyStore.Models.BabyStoreModelClasses
             var basketLine = GetBasketLineFromDbFor(productID);
             if (basketLine != null)
             {
-                db.BasketLines.Remove(basketLine);
+                _basketLineRepo.Delete(basketLine);
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
         }
 
         public void UpdateBasket(List<BasketLine> basketLines)
@@ -68,7 +78,7 @@ namespace BabyStore.Models.BabyStoreModelClasses
                     }
                 }
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
         }
 
         public void EmptyBasket()
@@ -76,14 +86,14 @@ namespace BabyStore.Models.BabyStoreModelClasses
             var basketLines = GetBasketLines();
             foreach (var line in basketLines)
             {
-                db.BasketLines.Remove(line);
+                _basketLineRepo.Delete(line);
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
         }
 
         public List<BasketLine> GetBasketLines()
         {
-            return db.BasketLines.Where(b => b.BasketID == BasketID).ToList();
+            return _basketLineRepo.GetTable().Where(b => b.BasketID == BasketID).ToList();
         }
 
         public decimal GetTotalCost()
@@ -91,7 +101,7 @@ namespace BabyStore.Models.BabyStoreModelClasses
             decimal basketTotal = decimal.Zero;
             if (GetBasketLines().Count > 0)
             {
-                basketTotal = db.BasketLines.Where(b => b.BasketID == BasketID).Sum(b => b.Product.Price * b.Quantity);
+                basketTotal = _basketLineRepo.GetTable().Where(b => b.BasketID == BasketID).Sum(b => b.Product.Price * b.Quantity);
             }
             return basketTotal;
         }
@@ -101,7 +111,7 @@ namespace BabyStore.Models.BabyStoreModelClasses
             int numberOfItems = 0;
             if (GetBasketLines().Count > 0)
             {
-                numberOfItems = db.BasketLines.Where(b => b.BasketID == BasketID).Sum(b => b.Quantity);
+                numberOfItems = _basketLineRepo.GetTable().Where(b => b.BasketID == BasketID).Sum(b => b.Quantity);
             }
             return numberOfItems;
         }
@@ -110,9 +120,9 @@ namespace BabyStore.Models.BabyStoreModelClasses
         {
             var currentBasket = GetBasketLines();
 
-            var userBasket = db.BasketLines.Where(b => b.BasketID == userName).ToList();
+            var userBasket = _basketLineRepo.GetTable().Where(b => b.BasketID == userName).ToList();
 
-            if (userBasket != null)
+            if (userBasket.Any())
             {
                 string prevID = BasketID;
                 BasketID = userName;
@@ -124,7 +134,6 @@ namespace BabyStore.Models.BabyStoreModelClasses
 
                 BasketID = prevID;
                 EmptyBasket();
-
             }
             else
             {
@@ -133,7 +142,7 @@ namespace BabyStore.Models.BabyStoreModelClasses
                     line.BasketID = userName;
                 }
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
             HttpContext.Current.Session[BasketSessionKey] = userName;
         }
 
@@ -144,23 +153,16 @@ namespace BabyStore.Models.BabyStoreModelClasses
 
             foreach (var item in basketLines)
             {
-                OrderLine orderLine = new OrderLine
-                {
-                    Product = item.Product,
-                    ProductID = item.ProductID,
-                    ProductName = item.Product.Name,
-                    Quantity = item.Quantity,
-                    UnitPrice = item.Product.Price,
-                    OrderID = orderID
-                };
+                OrderLine orderLine = CreateOrderLine(orderID, item);
                 orderTotal += (item.Quantity * item.Product.Price);
-                db.OrderLines.Add(orderLine);
+                _unitOfWork.GenericRepository<OrderLine>().Add(orderLine);
             }
-            db.SaveChanges();
+            _unitOfWork.Save();
             EmptyBasket();
             return orderTotal;
         }
 
+       
         #region Private methods
 
         private string GetBasketID()
@@ -183,7 +185,20 @@ namespace BabyStore.Models.BabyStoreModelClasses
 
         private BasketLine GetBasketLineFromDbFor(int productID)
         {
-            return db.BasketLines.FirstOrDefault(b => b.BasketID == BasketID && b.ProductID == productID);
+            return _basketLineRepo.GetTable().FirstOrDefault(b => b.BasketID == BasketID && b.ProductID == productID);
+        }
+
+        private static OrderLine CreateOrderLine(int orderID, BasketLine item)
+        {
+            return new OrderLine
+            {
+                Product = item.Product,
+                ProductID = item.ProductID,
+                ProductName = item.Product.Name,
+                Quantity = item.Quantity,
+                UnitPrice = item.Product.Price,
+                OrderID = orderID
+            };
         }
 
         #endregion

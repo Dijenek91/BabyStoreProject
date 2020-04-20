@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Linq;
@@ -105,8 +103,6 @@ namespace BabyStore.Controllers.ModelControllers
 
         }
 
-       
-
         // GET: ProductImages/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -138,6 +134,7 @@ namespace BabyStore.Controllers.ModelControllers
 
             _productImageRepo.Delete(productImage);
             _unitOfWork.Save();
+
             return RedirectToAction("Index");
         }
 

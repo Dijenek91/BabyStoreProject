@@ -1,9 +1,6 @@
-﻿using System;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+﻿using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Web.Mvc;
 using BabyStore.DAL;
 using BabyStore.Models.BabyStoreModelClasses;
@@ -16,9 +13,9 @@ namespace BabyStore.Controllers.ModelControllers
     [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
-        private IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
-        private IGenericRepository<Category> _categoryRepo;
-        private IGenericRepository<Product> _productRepo;
+        private readonly IUnitOfWork<StoreContext> _unitOfWork = new GenericUnitOfWork<StoreContext>();
+        private readonly IGenericRepository<Category> _categoryRepo;
+        private readonly IGenericRepository<Product> _productRepo;
 
         public CategoriesController()
         {

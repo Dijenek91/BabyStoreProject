@@ -13,6 +13,7 @@ using BabyStore.RepositoryLayer;
 using BabyStore.RepositoryLayer.UnitOfWork;
 using BabyStore.Utilities;
 using Microsoft.AspNet.Identity.Owin;
+using Serilog;
 
 namespace BabyStore.Controllers.ModelControllers
 {
@@ -122,7 +123,7 @@ namespace BabyStore.Controllers.ModelControllers
             {
                 order.DateCreated = DateTime.Now;
                 _ordersRepo.Add(order);
-                _unitOfWork.Save();//TODO: this save might be to much?
+                _unitOfWork.Save();
                 //add the orderlines to the database after creating the order
                 Basket basket = Basket.GetBasket();
                 order.TotalPrice = basket.CreateOrderLines(order.OrderID);
@@ -292,13 +293,21 @@ namespace BabyStore.Controllers.ModelControllers
             return orderLine;
         }
 
-
-        #endregion
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
+        }
 
         protected override void Dispose(bool disposing)
         {
             _unitOfWork.Dispose();
             base.Dispose(disposing);
         }
+
+        #endregion
+
+
     }
 }
