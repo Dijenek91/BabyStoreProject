@@ -298,7 +298,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\ProductImages\Bed1.JPG" />
     <Content Include="Content\ProductImages\Bed2.JPG" />
@@ -388,6 +387,8 @@
     <Content Include="Content\ProductImages\Thumbnails\Vest2.jpg" />
     <Content Include="Content\ProductImages\Vest1.JPG" />
     <Content Include="Content\ProductImages\Vest2.JPG" />
+    <Content Include="Content\Reset\reset.css" />
+    <Content Include="Content\store.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -489,6 +490,7 @@
     <Content Include="Views\Orders\Index.cshtml" />
     <Content Include="Views\Error\PageNotFound.cshtml" />
     <Content Include="Views\Error\InternalServerError.cshtml" />
+    <Content Include="Example.html" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

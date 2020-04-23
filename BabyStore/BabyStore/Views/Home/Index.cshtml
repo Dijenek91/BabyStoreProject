@@ -16,7 +16,7 @@
                     </a>
                 }
                 <p>
-                    @Html.ActionLink(item.Product.Name, "Details", "Products", new { id = item.Product.ID}, null)
+                    @Html.ActionLink(item.Product.Name, "Details", "Products", new { id = item.Product.ID}, new { @class = "large-bold-text" })
                 </p>
             </div>
         }
