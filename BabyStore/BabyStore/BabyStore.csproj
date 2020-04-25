@@ -297,7 +297,9 @@
     <Compile Include="ViewModel\Security\EditUserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Banners\Register\register_shop_now_banner.jpg" />
     <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\fontawesome.css" />
     <Content Include="Content\PagedList.css" />
     <Content Include="Content\ProductImages\Bed1.JPG" />
     <Content Include="Content\ProductImages\Bed2.JPG" />
@@ -400,6 +402,9 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="webfonts\fa-brands-400.svg" />
+    <Content Include="webfonts\fa-regular-400.svg" />
+    <Content Include="webfonts\fa-solid-900.svg" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -491,6 +496,18 @@
     <Content Include="Views\Error\PageNotFound.cshtml" />
     <Content Include="Views\Error\InternalServerError.cshtml" />
     <Content Include="Example.html" />
+    <Content Include="webfonts\fa-brands-400.eot" />
+    <Content Include="webfonts\fa-brands-400.ttf" />
+    <Content Include="webfonts\fa-brands-400.woff" />
+    <Content Include="webfonts\fa-brands-400.woff2" />
+    <Content Include="webfonts\fa-regular-400.eot" />
+    <Content Include="webfonts\fa-regular-400.ttf" />
+    <Content Include="webfonts\fa-regular-400.woff" />
+    <Content Include="webfonts\fa-regular-400.woff2" />
+    <Content Include="webfonts\fa-solid-900.eot" />
+    <Content Include="webfonts\fa-solid-900.ttf" />
+    <Content Include="webfonts\fa-solid-900.woff" />
+    <Content Include="webfonts\fa-solid-900.woff2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

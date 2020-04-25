@@ -22,6 +22,9 @@
         }
     </div>
     <p>
-        @Html.ActionLink("Shop Now", "Index", "Products", null, new {@class = "btn btn-primary btn-lg" })
+        <a href="@Url.Action("Index", "Products")" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Shop Now</span>
+        </a>
     </p>
 </div>
