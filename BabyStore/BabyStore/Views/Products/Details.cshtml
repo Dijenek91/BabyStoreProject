@@ -4,74 +4,87 @@
     ViewBag.Title = "Product Details";
 }
 
-<h2>@ViewBag.Title</h2>
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Category.Name)
-        </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
+<div class="row">
+    <div class="col-md-offset-2 col-md-3">
+        <dl class="dl-horizontal">
+            <dt>
+                <h3 class="product-name">
+                    @Html.DisplayNameFor(model => model.Name)
+                </h3>
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        @if (Model.ProductImageMappings != null && Model.ProductImageMappings.Any())
-        {
-            <dt></dt>
             <dd>
-                <img src="@(Url.Content(Constants.ProductImagePath) + Model.ProductImageMappings.OrderBy(pim => pim.ImageNumber).ElementAt(0).ProductImage.FileName)"
-                     style=padding:5px>
+                <h3 class="product-name">
+                    @Html.DisplayFor(model => model.Name)
+                </h3>
             </dd>
-            <dt></dt>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Category.Name)
+            </dt>
+
             <dd>
-                @foreach (var item in Model.ProductImageMappings.OrderBy(pim => pim.ImageNumber))
+                @Html.DisplayFor(model => model.Category.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+
+            <dt>
+                Quantity:
+            </dt>
+            <dd>
+                @using (Html.BeginForm("AddToBasket", "Basket"))
                 {
-                    <a href="@(Url.Content(Constants.ProductImagePath) + item.ProductImage.FileName)">
-                        <img src="@(Url.Content(Constants.ProductThumbnailPath) + item.ProductImage.FileName)" style=padding:5px>
-                    </a>
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.ID)
+                    @Html.DropDownList("quantity", Enumerable.Range(1, 10).Select(i => new SelectListItem {Text = i.ToString(), Value = i.ToString()}))
+
+                    <button type="submit" class="btn btn-primary" style="margin: 10px 2px">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Add to Basket</span>
+                    </button>
                 }
             </dd>
-        }
-        <dt>
-            Quantity:
-        </dt>
-        <dd>
-            @using (Html.BeginForm("AddToBasket", "Basket"))
-            {
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(model => model.ID)
-                @Html.DropDownList("quantity", Enumerable.Range(1, 10).Select(i => new SelectListItem{ Text = i.ToString(), Value = i.ToString() }))
-                <input type="submit" class="btn btn-primary btn-xs" value="Add to Basket">
-            }
-        </dd>
 
-    </dl>
+        </dl>
+    </div>
+    <div class="col-md-5">
+        <dl class="dl-horizontal">
+            @if (Model.ProductImageMappings != null && Model.ProductImageMappings.Any())
+            {
+                <dt></dt>
+                <dd>
+                    <img src="@(Url.Content(Constants.ProductImagePath) + Model.ProductImageMappings.OrderBy(pim => pim.ImageNumber).ElementAt(0).ProductImage.FileName)"
+                         style=padding: 5px>
+                </dd>
+                <dt></dt>
+                <dd>
+                    @foreach (var item in Model.ProductImageMappings.OrderBy(pim => pim.ImageNumber))
+                    {
+                        <a href="@(Url.Content(Constants.ProductImagePath) + item.ProductImage.FileName)">
+                            <img src="@(Url.Content(Constants.ProductThumbnailPath) + item.ProductImage.FileName)" style=padding: 5px>
+                        </a>
+                    }
+                </dd>
+            }
+            </dl>
+    </div>
 </div>
 <p>
     @if (Request.IsAuthenticated && User.IsInRole("Admin"))

@@ -17,11 +17,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <i class ="fas fa-store navbar-brand"></i>
-                @Html.ActionLink("BabyStore", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                
+                <a href="@Url.Action("Index", "Home")">
+                    <i class="fas fa-store navbar-brand"><span style="padding-left: 2px">Babystore</span></i> 
+                </a>
             </div>
             <div class="navbar-inner">
-                
                 <ul class="nav navbar-nav">
                     <li>@Html.RouteLink("View all our Products", "ProductsIndex")</li>
                     <li>@Html.ActionLink("View Categories", "Index", "Categories")</li>

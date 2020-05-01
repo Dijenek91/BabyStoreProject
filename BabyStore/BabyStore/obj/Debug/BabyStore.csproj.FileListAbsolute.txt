@@ -99,3 +99,6 @@ D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.C
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.File.pdb
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\Serilog.Sinks.File.xml
 D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\obj\Debug\BabyStore.Migrations.StoreConfigurations.rowVersionAddToProduct.resources
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\SendGrid.dll
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\SendGrid.pdb
+D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\bin\SendGrid.xml

@@ -1,0 +1,39 @@
+2020-05-01 16:32:27.695 +02:00 [DBG] System.Threading.Tasks.Task`1[System.String]STATUS CODE:Accepted
+2020-05-01 16:44:32.597 +02:00 [ERR] Exception occured with message: Value cannot be null.
+Parameter name: ApiKey
+2020-05-01 16:44:32.631 +02:00 [ERR] Stacktrace:    at SendGrid.SendGridClient..ctor(HttpClient httpClient, SendGridClientOptions options)
+   at SendGrid.SendGridClient..ctor(String apiKey, String host, Dictionary`2 requestHeaders, String version, String urlPath)
+   at BabyStore.EmailService.<configSendGridasync>d__1.MoveNext() in D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\App_Start\IdentityConfig.cs:line 35
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at BabyStore.EmailService.<SendAsync>d__0.MoveNext() in D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\App_Start\IdentityConfig.cs:line 27
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.AspNet.Identity.UserManager`2.<SendEmailAsync>d__129.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at BabyStore.Controllers.AccountController.<Register>d__15.MoveNext() in D:\Life is Study\GitHub\BabyStoreProject\BabyStore\BabyStore\Controllers\AccountController.cs:line 215
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Web.Mvc.Async.TaskAsyncActionDescriptor.EndExecute(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass37.<BeginInvokeAsynchronousActionMethod>b__36(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3d()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.AsyncInvocationWithFilters.<>c__DisplayClass46.<InvokeActionMethodFilterAsynchronouslyRecursive>b__3f()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass33.<BeginInvokeActionMethodWithFilters>b__32(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.CallEndDelegate(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResultBase`1.End()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<>c__DisplayClass2b.<BeginInvokeAction>b__1c()
+   at System.Web.Mvc.Async.AsyncControllerActionInvoker.<>c__DisplayClass21.<BeginInvokeAction>b__1e(IAsyncResult asyncResult)
+2020-05-01 16:50:19.395 +02:00 [DBG] System.Threading.Tasks.Task`1[System.String]STATUS CODE:Accepted
+2020-05-01 16:55:22.225 +02:00 [DBG] System.Threading.Tasks.Task`1[System.String]STATUS CODE:Accepted
+2020-05-01 17:37:07.168 +02:00 [DBG] System.Threading.Tasks.Task`1[System.String]STATUS CODE:Accepted

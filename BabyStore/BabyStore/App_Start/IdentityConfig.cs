@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Configuration;
 using System.Data.Entity;
+using System.Diagnostics;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -10,15 +13,35 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using Serilog;
 
 namespace BabyStore
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
             // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            await configSendGridasync(message);
+        }
+
+        // Use NuGet to install SendGrid (Basic C# client lib) 
+        private async Task configSendGridasync(IdentityMessage message)
+        {
+            var apiKey = ConfigurationManager.AppSettings["SendGrid_Api_Key"];
+                //System.Environment.GetEnvironmentVariable("SENDGRID_API_KEY2");
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("donotreply@babystore.com", "Your Babystore");
+            var subject = message.Subject;
+            var to = new EmailAddress(message.Destination);
+            var plainTextContent = message.Body;
+            var htmlContent = message.Body;
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+
+            var response = await client.SendEmailAsync(msg);
+            Log.Debug("Sending email to " + message.Destination + " STATUS CODE:" + response.StatusCode);
         }
     }
 

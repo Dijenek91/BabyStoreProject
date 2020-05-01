@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BabyStore.Models;
 using BabyStore.Models.BabyStoreModelClasses;
+using Serilog;
 
 namespace BabyStore.Controllers
 {
@@ -81,6 +82,18 @@ namespace BabyStore.Controllers
             {
                 userWasLoggedIn = true;
             }
+
+            // Require the user to have a confirmed email before they can log on.
+            var user = await UserManager.FindByNameAsync(model.Email);
+            if (user != null)
+            {
+                if (!await UserManager.IsEmailConfirmedAsync(user.Id))
+                {
+                    ViewBag.errorMessage = "You must have a confirmed email to log on.";
+                    return View("Error");
+                }
+            }
+
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
@@ -185,18 +198,23 @@ namespace BabyStore.Controllers
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
-                {
+                {   
                     await UserManager.AddToRoleAsync(user.Id, "Users");
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+                    //automatic sign in is disabled after registration, user needs to confirm through email
+                    //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
+
                     Basket basket = Basket.GetBasket();
                     basket.MigrateBasket(model.Email);
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                   
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\""
+                       + callbackUrl + "\">here</a>");
 
-                    return RedirectToLocal(returnUrl);
+                    ViewBag.Message = "Check your email and confirm your account, you must be confirmed before you can log in.";
+
+                    return View("Info");
+                    //return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
             }
@@ -518,5 +536,12 @@ namespace BabyStore.Controllers
             }
         }
         #endregion
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
+        }
     }
 }

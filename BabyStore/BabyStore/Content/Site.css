@@ -30,3 +30,7 @@ textarea {
     display:inline-block;
     vertical-align: middle;
 }
+
+h3 {
+    margin: 5px;
+}
