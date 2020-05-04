@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BabyStore.Models;
 using BabyStore.ViewModel.Security;
+using Serilog;
 
 namespace BabyStore.Controllers
 {
@@ -422,6 +423,14 @@ namespace BabyStore.Controllers
             Error
         }
 
-#endregion
+        #endregion
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            Log.Error("Exception occured with message: {Message}", filterContext.Exception.Message);
+            Log.Error("Stacktrace: {StackTrace}", filterContext.Exception.StackTrace);
+            base.OnException(filterContext);
+        }
+
     }
 }

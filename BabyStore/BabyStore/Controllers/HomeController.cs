@@ -10,6 +10,7 @@ using BabyStore.ViewModel.Products;
 
 namespace BabyStore.Controllers
 {
+    //[RequireHttps]
     public class HomeController : Controller
     {
         private readonly IUnitOfWork<StoreContext> _unitOfWork;
