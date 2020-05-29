@@ -1,2 +1,2 @@
 # BabyStoreProject
- Novi pokusaj babystore projekta na bazi pdf, ali sada skroz full iz pocetka
+ Novi pokusaj babystore projekta , asp.net + bootstrap v3 + code first entity framework
